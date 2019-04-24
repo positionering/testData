@@ -7,6 +7,7 @@
 
 #include <libsbp/sbp.h>
 #include <libsbp/navigation.h>
+#include <libsbp/orientation.h>
 #include <libsbp/system.h>
 
 char *tcp_ip_addr = NULL;
@@ -14,10 +15,8 @@ char *tcp_ip_port = NULL;
 static sbp_msg_callbacks_node_t heartbeat_callback_node;
 //static sbp_msg_callbacks_node_t gps_time_node;
 static sbp_msg_callbacks_node_t pos_llh_node;
+static sbp_msg_callbacks_node_t baseline_heading_callback_node;
 int socket_desc = -1;
-
-FILE * f;
-
 
 
 struct piksi_msg {
@@ -76,19 +75,6 @@ void heartbeat_callback(u16 sender_id, u8 len, u8 msg[], void *context)
  // fprintf(stdout, "%s\n", __FUNCTION__);
 }
 
-/*
-void gps_time_callback(u16 sender_id, u8 len, u8 msg[], void *context)
-{
-  (void)sender_id, (void)len, (void)msg, (void)context;
-  // fprintf(stdout, "%s\n", __FUNCTION__);
-
-  msg_utc_time_t gps_time = *(msg_utc_time_t *)msg;
-//  piksi.hr = gps_time.hours;
-//  piksi.min = gps_time.minutes;
-//  piksi.sec = gps_time.seconds;
-  piksi.ns = gps_time.ns;
-}*/
-
 
 void pos_llh_callback(u16 sender_id, u8 len, u8 msg[], void *context)
 {
@@ -99,9 +85,21 @@ void pos_llh_callback(u16 sender_id, u8 len, u8 msg[], void *context)
   //piksi.lat = pos_llh.lat;
   //piksi.lon = pos_llh.lon;
   
-  fprintf(f, "%f %f\n", pos_llh.lat ,pos_llh.lon );
+  printf("%.10f %.10f\n", pos_llh.lat ,pos_llh.lon );
+}
+
+void baseline_heading_callback(u16 sender_id, u8 len, u8 msg[], void *context)
+{
+  (void)sender_id, (void)len, (void)msg, (void)context;
+  // fprintf(stdout, "%s\n", __FUNCTION__);
+
+  msg_baseline_heading_t data = *(msg_baseline_heading_t*)msg;
+  //piksi.lat = pos_llh.lat;
+  //piksi.lon = pos_llh.lon;
   
-  
+  if( strcmp(tcp_ip_addr,"192.168.0.223") == 0){
+  printf("%.10f\n", ((data.heading)/1000.0) );
+  }
 }
 
 
@@ -116,14 +114,6 @@ s32 socket_read(u8 *buff, u32 n, void *context)
 
 int main(int argc, char **argv)
 {
-  f = fopen("file.txt", "w");
-  
-  if (f == NULL)
-  {
-    printf("Error opening file!\n");
-    exit(1);
-  }
-  
   int opt;
   int result = 0;
   sbp_state_t s;
@@ -168,6 +158,10 @@ int main(int argc, char **argv)
   sbp_state_init(&s);
   //sbp_register_callback(&s, SBP_MSG_UTC_TIME, &gps_time_callback, NULL,
   //                      &gps_time_node); // 252
+  
+  
+   sbp_register_callback(&s, SBP_MSG_BASELINE_HEADING, &baseline_heading_callback, NULL,
+                        &baseline_heading_callback_node); // 522
   sbp_register_callback(&s, SBP_MSG_POS_LLH, &pos_llh_callback, NULL,
                         &pos_llh_node); // 522
   sbp_register_callback(&s, SBP_MSG_HEARTBEAT, &heartbeat_callback, NULL,
@@ -180,6 +174,5 @@ int main(int argc, char **argv)
   close_socket();
   free(tcp_ip_addr);
   free(tcp_ip_port);
-  fclose(f);
   return result;
 }

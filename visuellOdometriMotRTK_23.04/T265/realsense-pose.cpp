@@ -192,22 +192,22 @@ int main(int argc, char * argv[]) try
 
  
     std::string temp;
+    float sp1_x = 0;
+    float sp1_z = 0;
+    
+    float sp2_x = 0;
+    float sp2_z = 0;
+    
     float speed1 = 0;
     float speed2 = 0;
+    
     std::string::size_type sz;
-
-    int fd;
-    std::string myfifo = "/tmp/myfifo";
-    mkfifo(myfifo.c_str(), 0666);
     
-    std::string writePipe = "0.000 0.000 0.000";
-    freopen( "output.txt", "w", stdout );
-    
-    auto start = std::chrono::system_clock::now();
+    rs2_vector sp1 = {sp1_x,0,sp1_z};
+    rs2_vector sp2 = {sp2_x,0,sp2_z};
     
     while (true)
     {
-        fd = open(myfifo.c_str(), O_WRONLY | O_NONBLOCK );
         auto frames = pipe.wait_for_frames();
         auto f = frames.first_or_default(RS2_STREAM_POSE);
         auto pose_data = f.as<rs2::pose_frame>().get_pose_data();
@@ -242,31 +242,42 @@ int main(int argc, char * argv[]) try
 	//	std::cout << temp << std::endl;
 		speed1 = std::stof (temp,&sz);
 		speed2 = std::stof (temp.substr(sz));
+		
+		sp1_x = sin(theta.y) * speed1;
+		sp1_z = cos(theta.y) * speed1;
+		
+		sp2_x = sin(theta.y) * speed2; 
+		sp2_z = cos(theta.y) * speed2;
+		
+		sp1.x = sp1_x;
+		sp1.z = sp1_z;
+	
+		sp2.x = sp2_x;
+		sp2.z = sp2_z;
+		
+		
 		} catch(const std::exception& e){
 			std::cout <<"exception:("<< e.what() <<std::endl;
-			speed1 = 0;
-			speed2 = 0;
+			//ifall gammla värde behålls så gör inget här
+			sp1 = {0,0,0};
+			sp2 = {0,0,0};
 		}
 		}
 		
-        // bool b1 = wheel_odom_snr.send_wheel_odometry(0, f.get_frame_number(), {speed1,0,0});
-        // bool b2 = wheel_odom_snr.send_wheel_odometry(1, f.get_frame_number(), {speed2,0,0});
-
+        if(strcmp(argv[1],"1") == 0){
+        
+            std::cout << "vinkeln " << theta.y << std::endl;
+            std::cout <<" org speed 1 " <<speed1 << std::endl;            
+            std::cout <<"speed 1 " <<sp1 << std::endl;
+            std::cout <<"speed 2 " << sp2 << std::endl;
+            bool b1 = wheel_odom_snr.send_wheel_odometry(0, f.get_frame_number(), sp1);
+            bool b2 = wheel_odom_snr.send_wheel_odometry(1, f.get_frame_number(), sp2);
+        }
 		
-    writePipe = (fToString(pose_data.translation.x) + " " + fToString(pose_data.translation.y) + " "  + fToString(pose_data.translation.z));
-	
-	write(fd, writePipe.c_str(),writePipe.size());
-	close(fd);	   
-	
-	 auto end = std::chrono::system_clock::now();
-
-    std::chrono::duration<double> elapsed_seconds = end-start; 
-	
-    std::cout << elapsed_seconds.count() << " " << std::setprecision(3) << std::fixed << pose_data.translation.x << " " <<
+    std::cout << std::setprecision(6) << std::fixed << pose_data.translation.x << " " <<
             pose_data.translation.y << " " << pose_data.translation.z <<std::endl;
     }
     
-    unlink(myfifo.c_str());
     return EXIT_SUCCESS;
 }
 catch (const rs2::error & e)
