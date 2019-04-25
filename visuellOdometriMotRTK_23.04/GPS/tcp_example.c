@@ -85,7 +85,10 @@ void pos_llh_callback(u16 sender_id, u8 len, u8 msg[], void *context)
   //piksi.lat = pos_llh.lat;
   //piksi.lon = pos_llh.lon;
   
-  printf("%.10f %.10f\n", pos_llh.lat ,pos_llh.lon );
+    if( strcmp(tcp_ip_addr,"192.168.0.222") == 0){
+        printf("%.10f %.10f\n", pos_llh.lat ,pos_llh.lon );
+    }
+  
 }
 
 void baseline_heading_callback(u16 sender_id, u8 len, u8 msg[], void *context)

@@ -137,7 +137,7 @@ bool cArduino::open(ArduinoBaundRate baundRate,char *DeviceFileName)
 	CLOCAL  : local connection, no modem contol
 	CREAD   : enable receiving characters
 	*/
-	newtio.c_cflag =  baundRate | CRTSCTS | CS8 | CLOCAL | CREAD;
+	newtio.c_cflag =  baundRate | CS8 | CLOCAL | CREAD;
 
 	/*
 	IGNPAR  : ignore bytes with parity errors
@@ -167,9 +167,9 @@ bool cArduino::open(ArduinoBaundRate baundRate,char *DeviceFileName)
 	newtio.c_cc[VQUIT]    = 0;     /* Ctrl-\ */
 	newtio.c_cc[VERASE]   = 0;     /* del */
 	newtio.c_cc[VKILL]    = 0;     /* @ */
-	newtio.c_cc[VEOF]     = 4;     /* Ctrl-d */
+	newtio.c_cc[VEOF]     = 0;     /* Ctrl-d */
 	newtio.c_cc[VTIME]    = 0;     /* inter-character timer unused */
-	newtio.c_cc[VMIN]     = 1;     /* blocking read until 1 character arrives */
+	newtio.c_cc[VMIN]     = 0;     /* blocking read until 1 character arrives */
 	newtio.c_cc[VSWTC]    = 0;     /* '\0' */
 	newtio.c_cc[VSTART]   = 0;     /* Ctrl-q */
 	newtio.c_cc[VSTOP]    = 0;     /* Ctrl-s */
@@ -213,12 +213,13 @@ string cArduino::read()
 	of characters read is smaller than the number of chars available,
 	subsequent reads will return the remaining chars. res will be set
 	to the actual number of characters actually read */
-	char buf[255];
+	char buf[12];
 
-	int res = ::read(fd,buf,255);
+	int res = ::read(fd,buf,12);
 	buf[res]=0;             /* set end of string, so we can printf */
 
 	string ret(buf);
+	flush();
 	return ret;
 }
 

@@ -180,7 +180,8 @@ int main(int argc, char * argv[]) try
     rs2::device dev = pf.get_device();
     auto wheel_odom_snr = dev.first<rs2::wheel_odometer>();
     
-    std::ifstream calibrationFile("../calibration_odometry.json");
+    std::ifstream calibrationFile("T265/calibration_odometry.json");
+   // std::ifstream calibrationFile("../calibration_odometry.json");
   //  std::ifstream calibrationFile("realsenset265/calibration_odometry.json");
     const std::string json_str((std::istreambuf_iterator<char>(calibrationFile)),
                       std::istreambuf_iterator<char>());
@@ -232,14 +233,14 @@ int main(int argc, char * argv[]) try
         
         //std::cout<<" X -> "<<get_theta().x*180/PI <<" Y -> " << get_theta().y*180/PI << " Z -> " << get_theta().z*180/PI<<std::endl;
        // std::cout<<" X -> "<<pose_data.translation.x <<" Y -> " << pose_data.translation.y << " Z -> " << pose_data.translation.z<<std::endl;
-        
+        std::string s;
 	    temp = arduino.read();
-//	    std::cout << temp << std::endl;
-	  	std::this_thread::sleep_for(std::chrono::milliseconds(250));	
-	    if(temp.size() > 8){
+	    //std::cout << temp << std::endl;
+	  	//std::this_thread::sleep_for(std::chrono::milliseconds(10));	
+	    if(temp.size() > 9){
 		
 		try{	
-	//	std::cout << temp << std::endl;
+//		std::cout << "Hastighet " << temp << std::endl;
 		speed1 = std::stof (temp,&sz);
 		speed2 = std::stof (temp.substr(sz));
 		
@@ -250,10 +251,10 @@ int main(int argc, char * argv[]) try
 		sp2_z = cos(theta.y) * speed2;
 		
 		sp1.x = sp1_x;
-		sp1.z = sp1_z;
+		sp1.z = -sp1_z;
 	
 		sp2.x = sp2_x;
-		sp2.z = sp2_z;
+		sp2.z = -sp2_z;
 		
 		
 		} catch(const std::exception& e){
@@ -265,17 +266,13 @@ int main(int argc, char * argv[]) try
 		}
 		
         if(strcmp(argv[1],"1") == 0){
-        
-            std::cout << "vinkeln " << theta.y << std::endl;
-            std::cout <<" org speed 1 " <<speed1 << std::endl;            
-            std::cout <<"speed 1 " <<sp1 << std::endl;
-            std::cout <<"speed 2 " << sp2 << std::endl;
+       
             bool b1 = wheel_odom_snr.send_wheel_odometry(0, f.get_frame_number(), sp1);
             bool b2 = wheel_odom_snr.send_wheel_odometry(1, f.get_frame_number(), sp2);
         }
 		
-    std::cout << std::setprecision(6) << std::fixed << pose_data.translation.x << " " <<
-            pose_data.translation.y << " " << pose_data.translation.z <<std::endl;
+    std::cout << std::setprecision(3) << std::fixed << pose_data.translation.x << " " <<
+            pose_data.translation.y << " " << pose_data.translation.z << " " << theta.y <<"      " << sp1 << " " << sp2 <<std::endl;
     }
     
     return EXIT_SUCCESS;
