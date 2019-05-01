@@ -29,8 +29,7 @@ filename_RTK = max(list_of_files_cords, key=os.path.getctime)
 
 for counter, t265_file in enumerate(list_of_files_t265):
     #cords_file = list_of_files_cords[counter]
-    #print(cords_file)
-    print(t265_file)
+  
     x_gnss = []
     z_gnss = []
     x_T265 = []
@@ -45,6 +44,9 @@ for counter, t265_file in enumerate(list_of_files_t265):
     first = True
     tic_r = []
     tic_l = []
+    v_T265_x = []
+    v_T265_z = [] 
+             
     """
     with open(cords_file, 'r') as f:
         f = f.readlines()
@@ -80,7 +82,8 @@ for counter, t265_file in enumerate(list_of_files_t265):
             v_rx.append(v_x)
             v_ry.append(v_z)
             v_r.append(math.sqrt(v_x**2+v_y**2+v_z**2))
-            
+          
+
             #vänster hjulhastighet
             
             v_x = float(line.split()[11].strip(","))
@@ -91,6 +94,12 @@ for counter, t265_file in enumerate(list_of_files_t265):
             v_ly.append(v_z)
             v_l.append(math.sqrt(v_x**2+v_y**2+v_z**2))
             
+            #T265 speed
+
+            v_T265_x.append(float(line.split()[16].strip(",")))
+            v_T265_z.append(float(line.split()[18]))
+             
+
             #pulser
             tic_r.append(float(line.split()[20]))
             tic_l.append(float(line.split()[19]))
@@ -136,7 +145,7 @@ for counter, t265_file in enumerate(list_of_files_t265):
     plt.savefig("figs/"+"hjulhastighet "+t265_file.split("/")[2]+".png")
     plt.close(fig2)
     
-    # Plott hjulhastigheter i 3D
+    # Plott hjulhastigheter och T-265 hastighet i 3D
     mpl.rcParams['legend.fontsize'] = 10
     
     fig3D = plt.figure()
@@ -149,20 +158,40 @@ for counter, t265_file in enumerate(list_of_files_t265):
    
     ax.plot(v_l3D[:,0],v_l3D[:,1],v_l3D[:,2], label='v_l')
     ax.plot(v_r3D[:,0],v_r3D[:,1],v_r3D[:,2], label='v_r')
+
+    v_l3D_2 = np.array([v_T265_x,v_T265_z,t])
+    v_l3D_2 = v_l3D_2.T
+
+    ax.plot(v_l3D_2[:,0],v_l3D_2[:,1],v_l3D_2[:,2], label='T265')
+    
     
     plt.title('3D-Hjulhastighet from test: ' + t265_file)
-    #ax.xlabel('m/s')
-    #ax.ylabel('m/s')
-    #ax.zlabel('ms')
-    
     ax.legend()
-    
-    #plt.show()
-
-    plt.savefig("figs/"+"3d-hjulhastighet "+t265_file.split("/")[2]+".png")
+  
+    plt.show()
+    plt.savefig("figs/"+"3d-hjulhastighet och T265-hastighet "+t265_file.split("/")[2]+".png")
     plt.close(fig3D)
     
+    #Plott T-265 hastighet i 3d
+    """
+    fig3D_2 = plt.figure()
+    ax = fig3D_2.gca(projection='3d')
+
+    v_l3D_2 = np.array([v_T265_x,v_T265_z,t])
+    v_l3D_2 = v_l3D_2.T
+
+    ax.plot(v_l3D_2[:,0],v_l3D_2[:,1],v_l3D_2[:,2], label='T265')
+    plt.title('3D-Hjulhastighet from test: ' + t265_file)
+    ax.legend()
+    plt.show()
+
+    plt.savefig("figs/"+"3d-t265 hastighet "+t265_file.split("/")[2]+".png")
     
+
+    
+    plt.close(fig3D_2)"""
+
+
     #plottar pluserna
     fig3 = plt.figure()
     plt.plot(t, tic_r, label='tic_r')
