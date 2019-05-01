@@ -1,4 +1,4 @@
-# Install script for directory: /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS
+# Install script for directory: /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

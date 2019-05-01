@@ -16,135 +16,64 @@
 #include <unistd.h>
 
 #include "cArduino.h"
+#include "motion.h"
 
+#include <cfloat>
 
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <termios.h>
 
 #include <cstring>
 #include <mutex>
 
-double PI = 3.141592653589793238462643383;
 
-struct short3
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <strings.h>
+
+#include <iostream>
+
+float PI = 3.141592653589793238462643383;
+
+
+inline rs2_quaternion quaternion_exp(rs2_vector v)
 {
-    uint16_t x, y, z;
-};
+    float x = v.x/2, y = v.y/2, z = v.z/2, th2, th = sqrtf(th2 = x*x + y*y + z*z);
+    float c = cosf(th), s = th2 < sqrtf(120*FLT_EPSILON) ? 1-th2/6 : sinf(th)/th;
+    rs2_quaternion Q = { s*x, s*y, s*z, c };
+    return Q;
+}
+
+inline rs2_quaternion quaternion_multiply(rs2_quaternion a, rs2_quaternion b)
+{
+    rs2_quaternion Q = {
+        a.x * b.w + a.w * b.x - a.z * b.y + a.y * b.z,
+        a.y * b.w + a.z * b.x + a.w * b.y - a.x * b.z,
+        a.z * b.w - a.y * b.x + a.x * b.y + a.w * b.z,
+        a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,
+    };
+    return Q;
+}
 
 
-struct float3 { 
-    float x, y, z; 
-    float3 operator*(float t)
-    {
-        return { x * t, y * t, z * t };
-    }
-
-    float3 operator-(float t)
-    {
-        return { x - t, y - t, z - t };
-    }
-
-    void operator*=(float t)
-    {
-        x = x * t;
-        y = y * t;
-        z = z * t;
-    }
-
-    void operator=(float3 other)
-    {
-        x = other.x;
-        y = other.y;
-        z = other.z;
-    }
-
-    void add(float t1, float t2, float t3)
-    {
-        x += t1;
-        y += t2;
-        z += t3;
-    }
-};
-
-
-
- float3 theta;
-    std::mutex theta_mtx;
-    /* alpha indicates the part that gyro and accelerometer take in computation of theta; higher alpha gives more weight to gyro, but too high
-    values cause drift; lower alpha gives more weight to accelerometer, which is more sensitive to disturbances */
-    float alpha = 0.98;
-    bool first = true;
-    // Keeps the arrival time of previous gyro frame
-double last_ts_gyro = 0;
-
- void process_gyro(rs2_vector gyro_data, double ts)
-    {
-        if (first) // On the first iteration, use only data from accelerometer to set the camera's initial position
-        {
-            last_ts_gyro = ts;
-            return;
-        }
-        // Holds the change in angle, as calculated from gyro
-        float3 gyro_angle;
-
-        // Initialize gyro_angle with data from gyro
-        gyro_angle.x = gyro_data.x; // Pitch
-        gyro_angle.y = gyro_data.y; // Yaw  
-        gyro_angle.z = gyro_data.z; // Roll
-
-        // Compute the difference between arrival times of previous and current gyro frames
-        double dt_gyro = (ts - last_ts_gyro) / 1000.0;
-        last_ts_gyro = ts;
-
-        // Change in angle equals gyro measures * time passed since last measurement
-        gyro_angle = gyro_angle * dt_gyro;
-
-        // Apply the calculated change of angle to the current angle (theta)
-        std::lock_guard<std::mutex> lock(theta_mtx);
-        theta.add(-gyro_angle.z, -gyro_angle.y, gyro_angle.x);
-    }
-
-    void process_accel(rs2_vector accel_data)
-    {
-        // Holds the angle as calculated from accelerometer data
-        float3 accel_angle;
-
-        // Calculate rotation angle from accelerometer data
-        accel_angle.z = atan2(accel_data.y, accel_data.z);
-        accel_angle.x = atan2(accel_data.x, sqrt(accel_data.y * accel_data.y + accel_data.z * accel_data.z));
-
-        // If it is the first iteration, set initial pose of camera according to accelerometer data (note the different handling for Y axis)
-        std::lock_guard<std::mutex> lock(theta_mtx);
-        if (first)
-        {
-            first = false;
-            theta = accel_angle;
-            // Since we can't infer the angle around Y axis using accelerometer data, we'll use PI as a convetion for the initial pose
-            theta.y = PI;
-        }
-        else
-        {
-            /* 
-            Apply Complementary Filter:
-                - high-pass filter = theta * alpha:  allows short-duration signals to pass through while filtering out signals
-                  that are steady over time, is used to cancel out drift.
-                - low-pass filter = accel * (1- alpha): lets through long term changes, filtering out short term fluctuations 
-            */
-            theta.x = theta.x * alpha + accel_angle.x * (1 - alpha);
-            theta.z = theta.z * alpha + accel_angle.z * (1 - alpha);
-        }
-    }
-    
-    // Returns the current rotation angle
-    float3 get_theta()
-    {
-        std::lock_guard<std::mutex> lock(theta_mtx);
-        return theta;
-    }
-
-
-
+rs2_pose predict_pose(rs2_pose & pose, float dt_s)
+{
+    rs2_pose P = pose;
+    P.translation.x = dt_s * (dt_s/2 * pose.acceleration.x + pose.velocity.x) + pose.translation.x;
+    P.translation.y = dt_s * (dt_s/2 * pose.acceleration.y + pose.velocity.y) + pose.translation.y;
+    P.translation.z = dt_s * (dt_s/2 * pose.acceleration.z + pose.velocity.z) + pose.translation.z;
+    rs2_vector W = {
+            dt_s * (dt_s/2 * pose.angular_acceleration.x + pose.angular_velocity.x),
+            dt_s * (dt_s/2 * pose.angular_acceleration.y + pose.angular_velocity.y),
+            dt_s * (dt_s/2 * pose.angular_acceleration.z + pose.angular_velocity.z),
+    };
+    P.rotation = quaternion_multiply(quaternion_exp(W), pose.rotation);
+    return P;
+}
 
 
 std::string fToString(float f){
@@ -155,135 +84,167 @@ std::string fToString(float f){
 
 }
 
-int main(int argc, char * argv[]) try
-{
-
-//    const double DIST_PULSE = 0.05; 
-
-    //std::string sensPort = argv[1];
+int main(int argc, char * argv[]) try {
     
-    //wheelSensor ws(sensPort);
-    
-    cArduino arduino(ArduinoBaundRate::B9600bps);
-    
-    rs2::pipeline pipe;
-    rs2::config cfg;
-    
-    
-    cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
-    cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-    cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);  
-  
-    
-    auto pf = pipe.start(cfg);
-      
-    rs2::device dev = pf.get_device();
-    auto wheel_odom_snr = dev.first<rs2::wheel_odometer>();
-    
-    std::ifstream calibrationFile("T265/calibration_odometry.json");
-   // std::ifstream calibrationFile("../calibration_odometry.json");
-  //  std::ifstream calibrationFile("realsenset265/calibration_odometry.json");
-    const std::string json_str((std::istreambuf_iterator<char>(calibrationFile)),
-                      std::istreambuf_iterator<char>());
-              
-    const std::vector<uint8_t> wo_calib(json_str.begin(), json_str.end());
- 
-    wheel_odom_snr.load_wheel_odometery_config(wo_calib);
-    
-
- 
-    std::string temp;
-    float sp1_x = 0;
-    float sp1_z = 0;
-    
-    float sp2_x = 0;
-    float sp2_z = 0;
-    
-    float speed1 = 0;
-    float speed2 = 0;
-    
-    std::string::size_type sz;
-    
-    rs2_vector sp1 = {sp1_x,0,sp1_z};
-    rs2_vector sp2 = {sp2_x,0,sp2_z};
-    
-    while (true)
-    {
-        auto frames = pipe.wait_for_frames();
-        auto f = frames.first_or_default(RS2_STREAM_POSE);
-        auto pose_data = f.as<rs2::pose_frame>().get_pose_data();
-       
-       
-       auto g = frames.first_or_default(RS2_STREAM_GYRO);
-       auto a = frames.first_or_default(RS2_STREAM_ACCEL);
-       // Cast the frame that arrived to motion frame
-        auto gyro_f = g.as<rs2::motion_frame>();
-        auto accel_f = a.as<rs2::motion_frame>();
-            // Get the timestamp of the current frame
-        double ts = gyro_f.get_timestamp();
-            // Get gyro measures
-        rs2_vector gyro_data = gyro_f.get_motion_data();
-            // Call function that computes the angle of motion based on the retrieved measures
-        process_gyro(gyro_data, ts);
-        
-            // Get accelerometer measures
-        rs2_vector accel_data = accel_f.get_motion_data();
-            // Call function that computes the angle of motion based on the retrieved measures
-        process_accel(accel_data);
-        
-        //std::cout<<" X -> "<<get_theta().x*180/PI <<" Y -> " << get_theta().y*180/PI << " Z -> " << get_theta().z*180/PI<<std::endl;
-       // std::cout<<" X -> "<<pose_data.translation.x <<" Y -> " << pose_data.translation.y << " Z -> " << pose_data.translation.z<<std::endl;
-        std::string s;
-	    temp = arduino.read();
-	    //std::cout << temp << std::endl;
-	  	//std::this_thread::sleep_for(std::chrono::milliseconds(10));	
-	    if(temp.size() > 9){
-		
-		try{	
-//		std::cout << "Hastighet " << temp << std::endl;
-		speed1 = std::stof (temp,&sz);
-		speed2 = std::stof (temp.substr(sz));
-		
-		sp1_x = sin(theta.y) * speed1;
-		sp1_z = cos(theta.y) * speed1;
-		
-		sp2_x = sin(theta.y) * speed2; 
-		sp2_z = cos(theta.y) * speed2;
-		
-		sp1.x = sp1_x;
-		sp1.z = -sp1_z;
-	
-		sp2.x = sp2_x;
-		sp2.z = -sp2_z;
-		
-		
-		} catch(const std::exception& e){
-			std::cout <<"exception:("<< e.what() <<std::endl;
-			//ifall gammla värde behålls så gör inget här
-			sp1 = {0,0,0};
-			sp2 = {0,0,0};
-		}
-		}
-		
-        if(strcmp(argv[1],"1") == 0){
-       
-            bool b1 = wheel_odom_snr.send_wheel_odometry(0, f.get_frame_number(), sp1);
-            bool b2 = wheel_odom_snr.send_wheel_odometry(1, f.get_frame_number(), sp2);
+        if(argc < 2){
+        std::cout << "Skriv argument för programmet, "
+                  << "1/0 för hjul odo, 1/0 för predict-pose"
+                  << std::endl;
         }
-		
-    std::cout << std::setprecision(3) << std::fixed << pose_data.translation.x << " " <<
-            pose_data.translation.y << " " << pose_data.translation.z << " " << theta.y <<"      " << sp1 << " " << sp2 <<std::endl;
-    }
-    
-    return EXIT_SUCCESS;
+        
+       // cArduino arduino(ArduinoBaundRate::B9600bps);
+        
+        serial s("/dev/ttyACM0");
+        rs2::pipeline pipe;
+        rs2::config cfg;
+        rotation_estimator algo;
+        
+        cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
+        cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+        cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);  
+      
+        
+        auto pf = pipe.start(cfg);
+          
+        rs2::device dev = pf.get_device();
+        auto wheel_odom_snr = dev.first<rs2::wheel_odometer>();
+       
+       
+        //std::ifstream calibrationFile("../forward_calib.json"); 
+        std::ifstream calibrationFile("T265/forward_calib.json");
+       // std::ifstream calibrationFile("T265/calibration_odometry.json");
+        //std::ifstream calibrationFile("T265/rightward_calib.json");
+      // std::ifstream calibrationFile("../downward_calib.json");
+      //  std::ifstream calibrationFile("realsenset265/calibration_odometry.json");
+        const std::string json_str((std::istreambuf_iterator<char>(calibrationFile)),
+                          std::istreambuf_iterator<char>());
+                  
+        const std::vector<uint8_t> wo_calib(json_str.begin(), json_str.end());
+     
+        wheel_odom_snr.load_wheel_odometery_config(wo_calib);
+        
+        
+        std::string temp;
+        std::string::size_type sz,sz1,sz2;
+        
+        float speed1 = 0;
+        float speed2 = 0;        
+        
+        rs2_vector sp1 = {0,0,0};
+        rs2_vector sp2 = {0,0,0};
+        
+        
+        rs2_vector sp1_o = {0,0,0};
+        rs2_vector sp2_o = {0,0,0};
+        
+        int count1 = 0;
+        int count2 = 0;
+        
+        while (true) {
+            
+            //testa att göra if satser på alla dessa för att kontrollera vilken frame det igentligen är!
+            auto frames = pipe.wait_for_frames();
+
+            auto f = frames.first_or_default(RS2_STREAM_POSE);
+            auto g = frames.first_or_default(RS2_STREAM_GYRO);
+            auto a = frames.first_or_default(RS2_STREAM_ACCEL);
+          
+            auto fp = f.as<rs2::pose_frame>();
+            
+            auto pose_data = fp.get_pose_data();
+            
+                
+           
+            auto gyro_f = g.as<rs2::motion_frame>();
+            auto accel_f = a.as<rs2::motion_frame>();
+                
+           
+            double ts = gyro_f.get_timestamp();
+            rs2_vector gyro_data = gyro_f.get_motion_data();
+            algo.process_gyro(gyro_data, ts);
+            
+              
+            rs2_vector accel_data = accel_f.get_motion_data();
+            algo.process_accel(accel_data);
+           
+	        do{
+	            temp = s.sread();
+	        } while(temp.size()< 9);
+	        
+	        //arduino.flush();
+	      	//std::this_thread::sleep_for(std::chrono::milliseconds(100));	
+	        //std::cout << temp << std::endl;
+	        //std::cout << temp.size() << std::endl;
+	        if(temp.size() > 9){
+            //std::cout << "Hastighet " << temp << std::endl;
+		        try{
+		            speed1 = std::stof (temp,&sz);
+		            speed2 = std::stof (temp.substr(sz),&sz1);
+		            
+		            count1 = std::stof (temp.substr(sz+sz1),&sz2);
+		            count2 = std::stof (temp.substr(sz+sz1+sz2));
+		            
+		          //  std::cout << "Hastighet " << speed1 << " " << speed2 << std::endl;
+		            
+		            
+		            //FORWARD
+		            sp1 = {sin(algo.get_theta().y) * speed1, 0 ,cos(algo.get_theta().y) * speed1 };
+		            sp2 = {sin(algo.get_theta().y) * speed2, 0 ,cos(algo.get_theta().y) * speed2 };
+		            
+		            //RIGHT
+		            //sp1 = {cos(algo.get_theta().y) * speed1, 0 ,sin(algo.get_theta().y) * speed1 };
+		            // sp2 = {cos(algo.get_theta().y) * speed2, 0 ,sin(algo.get_theta().y) * speed2 };
+
+                 
+		            
+		            //DOWN
+		            //sp1 = {sin(algo.get_theta().y) * speed1, cos(algo.get_theta().y) * speed1 ,0 };
+		            //sp2 = {sin(algo.get_theta().y) * speed2, cos(algo.get_theta().y) * speed1 ,0 };
+		            
+		            sp1_o = sp1;
+		            sp2_o = sp2;
+		            
+		        } catch(const std::exception& e){
+			        //std::cout <<"exception:("<< e.what() <<std::endl;
+			        //ifall kraschar pga illegal rs2_vector värde eller core dump avkommentera undre
+			        sp1 = sp1_o;
+			        sp2 = sp1_o;
+		            }
+		    }
+		    
+            if(strcmp(argv[1],"1") == 0){
+                bool b1 = wheel_odom_snr.send_wheel_odometry(0, f.get_frame_number(), sp1);
+                bool b2 = wheel_odom_snr.send_wheel_odometry(1, f.get_frame_number(), sp2);
+            }
+            
+            if(strcmp(argv[2],"1") == 0){
+                auto now = std::chrono::system_clock::now().time_since_epoch();
+                double now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+                double pose_time_ms = fp.get_timestamp();
+                float dt_s = static_cast<float>(std::max(0., (now_ms - pose_time_ms)/1000.));
+                pose_data = predict_pose(pose_data, dt_s);
+            }
+		    
+		    auto ms = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
+
+            std::cout   << std::setprecision(3) << std::fixed << 
+                    "tid: " << ms.count() <<
+                    " Pose: "  << pose_data.translation.x << " " << pose_data.translation.y << " " << pose_data.translation.z << 
+                    " Vinkel: " << algo.get_theta().y << 
+                    " confidence " << pose_data.tracker_confidence <<
+                    "     Sp1: " << sp1 <<
+                    "  T265 sp: " << pose_data.velocity << " " << count1 << " " << count2 << 
+                    "     Sp2: " << sp2  << std::endl;
+        
+            }
+        
+        return EXIT_SUCCESS;
 }
-catch (const rs2::error & e)
-{
+catch (const rs2::error & e) {
     std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n    " << e.what() << std::endl;
     return EXIT_FAILURE;
 }
-catch (const std::exception& e)
-{
+catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
     return EXIT_FAILURE;
 }

@@ -111,44 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named pose-grej
+# Target rules for targets named pose
 
 # Build rule for target.
-pose-grej: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 pose-grej
-.PHONY : pose-grej
+pose: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 pose
+.PHONY : pose
 
 # fast build rule for target.
-pose-grej/fast:
-	$(MAKE) -f CMakeFiles/pose-grej.dir/build.make CMakeFiles/pose-grej.dir/build
-.PHONY : pose-grej/fast
-
-cArduino.o: cArduino.cpp.o
-
-.PHONY : cArduino.o
-
-# target to build an object file
-cArduino.cpp.o:
-	$(MAKE) -f CMakeFiles/pose-grej.dir/build.make CMakeFiles/pose-grej.dir/cArduino.cpp.o
-.PHONY : cArduino.cpp.o
-
-cArduino.i: cArduino.cpp.i
-
-.PHONY : cArduino.i
-
-# target to preprocess a source file
-cArduino.cpp.i:
-	$(MAKE) -f CMakeFiles/pose-grej.dir/build.make CMakeFiles/pose-grej.dir/cArduino.cpp.i
-.PHONY : cArduino.cpp.i
-
-cArduino.s: cArduino.cpp.s
-
-.PHONY : cArduino.s
-
-# target to generate assembly for a file
-cArduino.cpp.s:
-	$(MAKE) -f CMakeFiles/pose-grej.dir/build.make CMakeFiles/pose-grej.dir/cArduino.cpp.s
-.PHONY : cArduino.cpp.s
+pose/fast:
+	$(MAKE) -f CMakeFiles/pose.dir/build.make CMakeFiles/pose.dir/build
+.PHONY : pose/fast
 
 realsense-pose.o: realsense-pose.cpp.o
 
@@ -156,7 +129,7 @@ realsense-pose.o: realsense-pose.cpp.o
 
 # target to build an object file
 realsense-pose.cpp.o:
-	$(MAKE) -f CMakeFiles/pose-grej.dir/build.make CMakeFiles/pose-grej.dir/realsense-pose.cpp.o
+	$(MAKE) -f CMakeFiles/pose.dir/build.make CMakeFiles/pose.dir/realsense-pose.cpp.o
 .PHONY : realsense-pose.cpp.o
 
 realsense-pose.i: realsense-pose.cpp.i
@@ -165,7 +138,7 @@ realsense-pose.i: realsense-pose.cpp.i
 
 # target to preprocess a source file
 realsense-pose.cpp.i:
-	$(MAKE) -f CMakeFiles/pose-grej.dir/build.make CMakeFiles/pose-grej.dir/realsense-pose.cpp.i
+	$(MAKE) -f CMakeFiles/pose.dir/build.make CMakeFiles/pose.dir/realsense-pose.cpp.i
 .PHONY : realsense-pose.cpp.i
 
 realsense-pose.s: realsense-pose.cpp.s
@@ -174,7 +147,7 @@ realsense-pose.s: realsense-pose.cpp.s
 
 # target to generate assembly for a file
 realsense-pose.cpp.s:
-	$(MAKE) -f CMakeFiles/pose-grej.dir/build.make CMakeFiles/pose-grej.dir/realsense-pose.cpp.s
+	$(MAKE) -f CMakeFiles/pose.dir/build.make CMakeFiles/pose.dir/realsense-pose.cpp.s
 .PHONY : realsense-pose.cpp.s
 
 # Help Target
@@ -184,11 +157,8 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... pose-grej"
+	@echo "... pose"
 	@echo "... edit_cache"
-	@echo "... cArduino.o"
-	@echo "... cArduino.i"
-	@echo "... cArduino.s"
 	@echo "... realsense-pose.o"
 	@echo "... realsense-pose.i"
 	@echo "... realsense-pose.s"

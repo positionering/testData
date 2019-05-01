@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS
+CMAKE_SOURCE_DIR = /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build
+CMAKE_BINARY_DIR = /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -123,32 +123,32 @@ libsbp_tcp_example/fast:
 	$(MAKE) -f CMakeFiles/libsbp_tcp_example.dir/build.make CMakeFiles/libsbp_tcp_example.dir/build
 .PHONY : libsbp_tcp_example/fast
 
-tcp_example.o: tcp_example.c.o
+tcp_example.o: tcp_example.cpp.o
 
 .PHONY : tcp_example.o
 
 # target to build an object file
-tcp_example.c.o:
-	$(MAKE) -f CMakeFiles/libsbp_tcp_example.dir/build.make CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o
-.PHONY : tcp_example.c.o
+tcp_example.cpp.o:
+	$(MAKE) -f CMakeFiles/libsbp_tcp_example.dir/build.make CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o
+.PHONY : tcp_example.cpp.o
 
-tcp_example.i: tcp_example.c.i
+tcp_example.i: tcp_example.cpp.i
 
 .PHONY : tcp_example.i
 
 # target to preprocess a source file
-tcp_example.c.i:
-	$(MAKE) -f CMakeFiles/libsbp_tcp_example.dir/build.make CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.i
-.PHONY : tcp_example.c.i
+tcp_example.cpp.i:
+	$(MAKE) -f CMakeFiles/libsbp_tcp_example.dir/build.make CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.i
+.PHONY : tcp_example.cpp.i
 
-tcp_example.s: tcp_example.c.s
+tcp_example.s: tcp_example.cpp.s
 
 .PHONY : tcp_example.s
 
 # target to generate assembly for a file
-tcp_example.c.s:
-	$(MAKE) -f CMakeFiles/libsbp_tcp_example.dir/build.make CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.s
-.PHONY : tcp_example.c.s
+tcp_example.cpp.s:
+	$(MAKE) -f CMakeFiles/libsbp_tcp_example.dir/build.make CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.s
+.PHONY : tcp_example.cpp.s
 
 # Help Target
 help:

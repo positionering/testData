@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS
+CMAKE_SOURCE_DIR = /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build
+CMAKE_BINARY_DIR = /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/libsbp_tcp_example.dir/depend.make
@@ -57,41 +57,41 @@ include CMakeFiles/libsbp_tcp_example.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/libsbp_tcp_example.dir/flags.make
 
-CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o: CMakeFiles/libsbp_tcp_example.dir/flags.make
-CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o: ../tcp_example.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o   -c /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/tcp_example.c
+CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o: CMakeFiles/libsbp_tcp_example.dir/flags.make
+CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o: ../tcp_example.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o -c /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/tcp_example.cpp
 
-CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/tcp_example.c > CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.i
+CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/tcp_example.cpp > CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.i
 
-CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/tcp_example.c -o CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.s
+CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/tcp_example.cpp -o CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.s
 
-CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o.requires:
+CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o.requires:
 
-.PHONY : CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o.requires
+.PHONY : CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o.requires
 
-CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o.provides: CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o.requires
-	$(MAKE) -f CMakeFiles/libsbp_tcp_example.dir/build.make CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o.provides.build
-.PHONY : CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o.provides
+CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o.provides: CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o.requires
+	$(MAKE) -f CMakeFiles/libsbp_tcp_example.dir/build.make CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o.provides.build
+.PHONY : CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o.provides
 
-CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o.provides.build: CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o
+CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o.provides.build: CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o
 
 
 # Object files for target libsbp_tcp_example
 libsbp_tcp_example_OBJECTS = \
-"CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o"
+"CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o"
 
 # External object files for target libsbp_tcp_example
 libsbp_tcp_example_EXTERNAL_OBJECTS =
 
-libsbp_tcp_example: CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o
+libsbp_tcp_example: CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o
 libsbp_tcp_example: CMakeFiles/libsbp_tcp_example.dir/build.make
 libsbp_tcp_example: CMakeFiles/libsbp_tcp_example.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable libsbp_tcp_example"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable libsbp_tcp_example"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/libsbp_tcp_example.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -99,7 +99,7 @@ CMakeFiles/libsbp_tcp_example.dir/build: libsbp_tcp_example
 
 .PHONY : CMakeFiles/libsbp_tcp_example.dir/build
 
-CMakeFiles/libsbp_tcp_example.dir/requires: CMakeFiles/libsbp_tcp_example.dir/tcp_example.c.o.requires
+CMakeFiles/libsbp_tcp_example.dir/requires: CMakeFiles/libsbp_tcp_example.dir/tcp_example.cpp.o.requires
 
 .PHONY : CMakeFiles/libsbp_tcp_example.dir/requires
 
@@ -108,6 +108,6 @@ CMakeFiles/libsbp_tcp_example.dir/clean:
 .PHONY : CMakeFiles/libsbp_tcp_example.dir/clean
 
 CMakeFiles/libsbp_tcp_example.dir/depend:
-	cd /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build /home/nadim/Desktop/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles/libsbp_tcp_example.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build /home/nadim/Desktop/proj/testData/visuellOdometriMotRTK_23.04/GPS/build/CMakeFiles/libsbp_tcp_example.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/libsbp_tcp_example.dir/depend
 
