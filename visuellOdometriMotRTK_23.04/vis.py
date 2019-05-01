@@ -180,26 +180,3 @@ for counter, t265_file in enumerate(list_of_files_t265):
     
 
 
-#def dotproduct(v1, v2):
-#    return sum((a*b) for a, b in zip(v1, v2))
-
-
-#def length(v):
-#    return math.sqrt(dotproduct(v, v))
-
-
-#def angle(v1, v2):
-#    return math.acos(dotproduct(v1, v2) / length(v1) * length(v2))
-
-#reference_angle = angle(z_temp_RTK, z_temp_T265)
-
-#reference_angle = math.atan2(z_T265[index_T265] - z_gnss[index_RTK], x_T265[index_T265] - x_gnss[index_RTK])
-#print(reference_angle)
-#print(z_T265[index_T265])
-#print(z_gnss[index_RTK])
-
-
-#x_T265 = np.cos(reference_angle)*x_T265 - np.sin(reference_angle)*z_T265
-#z_T265 = np.sin(reference_angle)*x_T265 + np.cos(reference_angle)*z_T265
-
-
