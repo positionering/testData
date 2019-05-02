@@ -2,12 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib as mpl
-import utm
+#import utm
 import math
 import glob
 import os
-
-
+from sensor_location import *
 
 
 
@@ -168,7 +167,7 @@ for counter, t265_file in enumerate(list_of_files_t265):
     plt.title('3D-Hjulhastighet from test: ' + t265_file)
     ax.legend()
   
-    plt.show()
+    
     plt.savefig("figs/"+"3d-hjulhastighet och T265-hastighet "+t265_file.split("/")[2]+".png")
     plt.close(fig3D)
     
@@ -206,6 +205,8 @@ for counter, t265_file in enumerate(list_of_files_t265):
 
     plt.savefig("figs/"+"Pulser "+t265_file.split("/")[2]+".png")
     plt.close(fig3)
+
+    #wo_location(tic_l, tic_r, 'Hjuldata from test: ' + t265_file )
     
 
 

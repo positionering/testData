@@ -1,7 +1,7 @@
 from math import acos, asin, cos, sin, sqrt
 from matplotlib import pyplot as plt
 
-def wo_location(c_left, c_right):
+def wo_location(c_left, c_right, filename):
     dpp = 0.55*3.14/29
     wdt = 1.08
     ad = 2*3.14/29
@@ -42,4 +42,5 @@ def wo_location(c_left, c_right):
     plt.plot(lx, ly)
     plt.grid()
     plt.axis('equal')
+    plt.title(filename)
     plt.show()
