@@ -9,41 +9,46 @@ def wo_location(c_left, c_right, filename):
     d1 = wdt/2 - cos(ad)*wdt/2
     d2 = sin(ad)*wdt/2
     d = sqrt(d1*d1 + d2*d2)
-    heading = 3.14/2 #north
+    heading = [3.14/2] #north
     location = [0, 0] # x, y
     x = 0
-    y = 0
+    y = -0.9
     lx= [0] 
-    ly = [0]
+    ly = [-0.9]
+    camx = [0]
+    camy = [0]
+
+
     for i in range(len(c_left)):
         if i == 0:
             continue
         
         if c_left[i]-c_left[i-1] != 0 and c_right[i]-c_right[i-1] != 0:
-            x += dpp*cos(heading)
-            y += dpp*sin(heading)
+            x += dpp*cos(heading[-1])
+            y += dpp*sin(heading[-1])
             lx.append(x)
             ly.append(y)
             continue
 
-        if c_left[i]-c_left[i-1] != 0:
-            heading -= ad
-            x += d*cos(heading)
-            y += d*sin(heading)
-            lx.append(x)
-            ly.append(y)
+        elif c_left[i]-c_left[i-1] != 0:
+            heading.append(heading[-1] - ad)
+            
 
-        if c_right[i]-c_right[i-1] != 0:
-            heading += ad
-            x += d*cos(heading)
-            y += d*sin(heading)
-            lx.append(x)
-            ly.append(y)
+        elif c_right[i]-c_right[i-1] != 0:
+            heading.append(heading[-1] + ad)
+        else:
+            continue
+        
+        x += d*cos(heading[-1])
+        y += d*sin(heading[-1])
+        camx.append(x + campos*cos(heading[-1]))
+        camy.append(y + campos*sin(heading[-1]))
+        lx.append(x)
+        ly.append(y)    
         print(heading, x, y)
 
-
-
     plt.plot(lx, ly)
+    plt.plot(camx, camy)
     plt.grid()
     plt.axis('equal')
     plt.title(filename)
