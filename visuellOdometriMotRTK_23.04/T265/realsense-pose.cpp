@@ -170,7 +170,12 @@ int main(int argc, char * argv[]) try {
 	        do{
 	            temp = s.sread();
 	        } while(temp.size()< 9);
-	        
+	       
+		 
+		     double theta = (PI/2)+algo.get_theta().y;
+		     
+		     //if(theta > )
+		     
 	        //arduino.flush();
 	      	//std::this_thread::sleep_for(std::chrono::milliseconds(100));	
 	        //std::cout << temp << std::endl;
@@ -178,6 +183,9 @@ int main(int argc, char * argv[]) try {
 	        if(temp.size() > 9){
             //std::cout << "Hastighet " << temp << std::endl;
 		        try{
+		        
+		            //speed1 = 10.5;
+		            //speed2 = 10.5;
 		            speed1 = std::stof (temp,&sz);
 		            speed2 = std::stof (temp.substr(sz),&sz1);
 		            
@@ -186,10 +194,13 @@ int main(int argc, char * argv[]) try {
 		            
 		          //  std::cout << "Hastighet " << speed1 << " " << speed2 << std::endl;
 		            
-		            
 		            //FORWARD
-		            sp1 = {sin(algo.get_theta().y) * speed1, 0 ,cos(algo.get_theta().y) * speed1 };
-		            sp2 = {sin(algo.get_theta().y) * speed2, 0 ,cos(algo.get_theta().y) * speed2 };
+		            sp1 = {cos(theta) * speed1, 0, sin(theta) * speed1 };
+		            sp2 = {cos(theta) * speed2, 0, sin(theta) * speed2 };
+		            
+		            //sp1 = {10.0, 10.0 ,10.0 };
+		            //sp2 = {10.0, 10.0 ,10.0 };
+		            
 		            
 		            //RIGHT
 		            //sp1 = {cos(algo.get_theta().y) * speed1, 0 ,sin(algo.get_theta().y) * speed1 };
@@ -227,10 +238,13 @@ int main(int argc, char * argv[]) try {
 		    
 		    auto ms = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
 
+
+            //std::cout << std::setprecision(3) << std::fixed << theta << " cos,x: " << cos(theta) << " sin,z: " << sin(theta) << " T265 hast: " << pose_data.velocity << std::endl; 
+
             std::cout   << std::setprecision(3) << std::fixed << 
                     "tid: " << ms.count() <<
                     " Pose: "  << pose_data.translation.x << " " << pose_data.translation.y << " " << pose_data.translation.z << 
-                    " Vinkel: " << algo.get_theta().y << 
+                    " Vinkel: " << theta << 
                     " confidence " << pose_data.tracker_confidence <<
                     "     Sp1: " << sp1 <<
                     "  T265 sp: " << pose_data.velocity << " " << count1 << " " << count2 << 
