@@ -206,7 +206,7 @@ for counter, t265_file in enumerate(list_of_files_t265):
     plt.savefig("figs/"+"Pulser "+t265_file.split("/")[2]+".png")
     plt.close(fig3)
 
-    #wo_location(tic_l, tic_r, 'Hjuldata from test: ' + t265_file )
+    wo_location(tic_l, tic_r, 'Hjuldata from test: ' + t265_file )
     
 
 
