@@ -4,7 +4,8 @@ from matplotlib import pyplot as plt
 def wo_location(c_left, c_right, filename):
     dpp = 0.55*3.14/29
     wdt = 1.08
-    ad = 2*3.14/29
+    campos = 0.9
+    ad = dpp/wdt
     d1 = wdt/2 - cos(ad)*wdt/2
     d2 = sin(ad)*wdt/2
     d = sqrt(d1*d1 + d2*d2)
@@ -34,13 +35,21 @@ def wo_location(c_left, c_right, filename):
 
         if c_right[i]-c_right[i-1] != 0:
             heading += ad
-
-            x -= d*cos(heading)
+            x += d*cos(heading)
             y += d*sin(heading)
+            lx.append(x)
+            ly.append(y)
         print(heading, x, y)
+
+
 
     plt.plot(lx, ly)
     plt.grid()
     plt.axis('equal')
     plt.title(filename)
     plt.show()
+
+c_left = [i for i in range(110)]
+c_right = [0 for i in range(110)]
+
+wo_location(c_left, c_right, 'lol')
