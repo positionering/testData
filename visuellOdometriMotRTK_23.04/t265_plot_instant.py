@@ -93,7 +93,7 @@ with open(filename_T265, 'r') as f:
       z_T265.append(float(z))
 
       #heading
-      cam_heading.append(float(line.split()[8])+3.141592/2)
+      cam_heading.append(-(float(line.split()[7])-3.141592))
 
 
     
@@ -112,15 +112,18 @@ with open(filename_T265, 'r') as f:
     plt.title('Observed data from test: ' + filename_T265)
     plt.xlabel('m')
     plt.ylabel('m')
+    plt.show()
+    plt.close(fig)
 
     # Plot heading mot tid
     fig2 = plt.figure()
-    plt.plot(wo_heading, t, label='wheel odometry heading')
-    plt.plot(cam_heading, t, label='camera heading')
+    plt.plot(t[1:-1], wo_heading, label='wheel odometry heading')
+    plt.plot(t, cam_heading, label='camera heading')
+    plt.legend()
 
    # plt.savefig("figs/"+filename_T265.split("/")[2]+".png")
     plt.show()
-    plt.close(fig)
+    plt.close(fig2)
     
     #plottar pluserna
     """
