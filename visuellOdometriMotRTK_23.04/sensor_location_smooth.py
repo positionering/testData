@@ -1,7 +1,18 @@
 from math import acos, asin, cos, sin, sqrt, atan2
 from matplotlib import pyplot as plt
 import numpy as np
-from array_smooth import array_smoothing
+
+def array_smoothing(x):
+    for i in range(len(x)):
+        c = 0
+        while i+c < len(x) and x[i+c] == x[i]:
+            c += 1
+        
+        for j in range(c):
+            x[i+j] += 1/c * j
+
+    return np.diff(np.array(x))
+
 
 def wo_location(c_left, c_right, filename):
     dpp = 0.55*3.14/29
@@ -55,7 +66,7 @@ def wo_location(c_left, c_right, filename):
     #plt.grid()
     #plt.axis('equal')
     #plt.title(filename)
-    #plt.show()
+    #plt.show()a
     return camx, camy
 
 #c_left = [i for i in range(110)]
