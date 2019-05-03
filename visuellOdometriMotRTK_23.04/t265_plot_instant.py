@@ -6,7 +6,9 @@ import utm
 import math
 import glob
 import os
-from sensor_location_smooth import *
+from sensor_location_smooth import wo_location
+from path_from_wheel_speed import path_from_wheel_speed
+
 
 
 
@@ -59,13 +61,13 @@ with open(filename_T265, 'r') as f:
       t.append(float(line.split(' ')[1]) - t_first)
 
       #höger hjulhastighet
-      #v_x = float(line.split()[22].strip(","))
-      #v_y = float(line.split()[23].strip(","))
-      #v_z = float(line.split()[24].strip(","))
+      v_x = float(line.split()[22].strip(","))
+      v_y = float(line.split()[23].strip(","))
+      v_z = float(line.split()[24].strip(","))
 
-      #v_rx.append(v_x)
-      #v_ry.append(v_z)
-      #v_r.append(math.sqrt(v_x**2+v_y**2+v_z**2))
+      v_rx.append(v_x)
+      v_ry.append(v_z)
+      v_r.append(math.sqrt(v_x**2+v_y**2+v_z**2))
 
 
       #vänster hjulhastighet
@@ -123,10 +125,27 @@ with open(filename_T265, 'r') as f:
    # plt.savefig("figs/"+filename_T265.split("/")[2]+".png")
     plt.show()
     plt.close(fig2)
+
+
+    lp = path_from_wheel_speed(np.array([v_lx,v_ly]),np.array(t))
+    rp = path_from_wheel_speed(np.array([v_rx,v_ry]),np.array(t))
+        
+    # Plottar wheel speed path
+    fig3 = plt.figure()
+    plt.plot(lp, label='Route from left wheel speed')
+    plt.plot(rp, label='Route from right wheel speed')
+    
+    plt.legend()
+    plt.axis('equal')
+    plt.title('Observed data from test: ' + filename_T265)
+    plt.xlabel('m')
+    plt.ylabel('m')
+    plt.show()
+    plt.close(fig3)
     
     #plottar pluserna
     """
-    fig3 = plt.figure()
+    fig4 = plt.figure()
     plt.plot(t, tic_r, label='tic_r')
     plt.plot(t, tic_l, label='tic_l')
 
@@ -138,7 +157,7 @@ with open(filename_T265, 'r') as f:
     plt.ylabel('m/s')
 
     plt.savefig("figs/"+"Pulser "+t265_file.split("/")[2]+".png")
-    plt.close(fig3)
+    plt.close(fig4)
     """
     
 
