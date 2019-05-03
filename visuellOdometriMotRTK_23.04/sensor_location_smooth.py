@@ -29,12 +29,14 @@ def wo_location(c_left, c_right, filename):
 
     c_left_diff = array_smoothing(c_left)
     c_right_diff = array_smoothing(c_right)
-
-    c_left_diff_temp = c_left_diff[abs(c_left_diff) < 2]
-    c_right_diff = c_right_diff[abs(c_left_diff) < 2]
-
-    c_left_diff = c_left_diff_temp[abs(c_right_diff) < 2]
-    c_right_diff = c_right_diff[abs(c_right_diff) < 2]
+    
+    i = [i for i, e in enumerate(abs(c_left_diff)) if e > 2]
+    j = [j for j, e in enumerate(abs(c_right_diff)) if e > 2]
+    index = list(set().union(i, j))
+    
+    for i in index:
+      c_left_diff[i] = 0
+      c_right_diff[i] = 0
     
     for i in range(len(c_left_diff)):
         if i == 0:

@@ -116,7 +116,7 @@ with open(filename_T265, 'r') as f:
 
     # Plot heading mot tid
     fig2 = plt.figure()
-    plt.plot(t[1:-1], wo_heading, label='wheel odometry heading')
+    plt.plot(t[1:], wo_heading, label='wheel odometry heading')
     plt.plot(t, cam_heading, label='camera heading')
     plt.legend()
 
