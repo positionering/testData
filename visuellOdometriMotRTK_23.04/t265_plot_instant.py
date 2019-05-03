@@ -14,7 +14,6 @@ list_of_files_t265 = sorted(glob.glob('test/t265/var*'))
 list_of_files_cords = sorted(glob.glob('test/cord/var*'))
 
 
-
 filelist = ['test/cord/test18.log', 'test/t265/test18_1.log', 'test/heading/test6U.log']
 
 filename_T265 = max(list_of_files_t265, key=os.path.getctime)
