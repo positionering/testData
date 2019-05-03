@@ -126,14 +126,13 @@ with open(filename_T265, 'r') as f:
     plt.show()
     plt.close(fig2)
 
-
-    lp = path_from_wheel_speed(np.array([v_lx,v_ly]),np.array(t))
-    rp = path_from_wheel_speed(np.array([v_rx,v_ry]),np.array(t))
+    lp = path_from_wheel_speed(np.array([v_lx,v_ly]).T,np.array(t),start=np.array([-0.54,0]))
+    rp = path_from_wheel_speed(np.array([v_rx,v_ry]).T,np.array(t),start=np.array([0.54,0]))
         
     # Plottar wheel speed path
     fig3 = plt.figure()
-    plt.plot(lp, label='Route from left wheel speed')
-    plt.plot(rp, label='Route from right wheel speed')
+    plt.plot(lp[:,0],lp[:,1], label='Route from left wheel speed')
+    plt.plot(rp[:,0],rp[:,1], label='Route from right wheel speed')
     
     plt.legend()
     plt.axis('equal')
