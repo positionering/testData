@@ -41,7 +41,8 @@ first = True
 tic_r = []
 tic_l = []
 v_T265_x = []
-v_T265_z = [] 
+v_T265_z = []
+cam_heading = [] 
             
 
 with open(filename_T265, 'r') as f:
@@ -91,9 +92,12 @@ with open(filename_T265, 'r') as f:
       x_T265.append(-float(x))
       z_T265.append(float(z))
 
+      #heading
+      cam_heading.append(float(line.split()[8])+3.141592/2)
+
 
     
-    camx, camy = wo_location(tic_l, tic_r, ' ')
+    wo_x, wo_y, wo_heading = wo_location(tic_l, tic_r, ' ')
     
     x_T265 = np.array(x_T265)
     z_T265 = np.array(z_T265)
@@ -101,13 +105,18 @@ with open(filename_T265, 'r') as f:
     # Plottar t265 path
     fig = plt.figure()
     plt.plot(x_T265, z_T265, label='Route from T265')
-    plt.plot(camx, camy, label='Route from wheel odometry')
+    plt.plot(wo_x, wo_y, label='Route from wheel odometry')
     
     plt.legend()
     plt.axis('equal')
     plt.title('Observed data from test: ' + filename_T265)
     plt.xlabel('m')
     plt.ylabel('m')
+
+    # Plot heading mot tid
+    fig2 = plt.figure()
+    plt.plot(wo_heading, t, label='wheel odometry heading')
+    plt.plot(cam_heading, t, label='camera heading')
 
    # plt.savefig("figs/"+filename_T265.split("/")[2]+".png")
     plt.show()

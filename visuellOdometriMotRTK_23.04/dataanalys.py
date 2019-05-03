@@ -97,7 +97,7 @@ for t265_file, gnss_file in t265_list_of_files, gnss_list_of_files:
 
     ### PLOTTING ###
 
-    # Plot 1: GNSS och hjulodometri
+    # Plot 1: POS GNSS och hjulodometri
     fig = plt.figure()
 
     plt.plot(gnss_pos_x, gnss_pos_z, label='Rutt från RTK-GNSS')
@@ -113,7 +113,7 @@ for t265_file, gnss_file in t265_list_of_files, gnss_list_of_files:
     plt.savefig('sluttest/figures/' + t265_file.split('/')[2].split('.')[0] + 'POS:GNSS_WO.png') # TODO: Mappstruktur
     plt.close(fig)
 
-    # Plot 2: GNSS och T265
+    # Plot 2: POS GNSS och T265
     fig2 = plt.figure()
 
     plt.plot(gnss_pos_x, gnss_pos_z, label='Rutt från RTK-GNSS')
@@ -130,7 +130,7 @@ for t265_file, gnss_file in t265_list_of_files, gnss_list_of_files:
     plt.savefig('sluttest/figures/' + t265_file.split('/')[2].split('.')[0] + 'POS:GNSS_T265.png') # TODO: Mappstruktur
     plt.close(fig2)
 
-    # Plot 3: Hjulhastighet mot tid
+    # Plot 3: VEL Hjulhastighet mot tid
     fig3 = plt.figure()
 
     plt.plot(t, wo_v_l, label='Vänster hjul')

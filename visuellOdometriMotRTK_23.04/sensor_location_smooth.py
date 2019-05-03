@@ -18,10 +18,8 @@ def wo_location(c_left, c_right, filename):
     dpp = 0.55*3.14/29
     wdt = 1.08
     campos = 0.9
-    ad = dpp/wdt
    
-    heading = [3.14/2] #north
-    location = [0, 0] # x, y
+    heading = [-3.14/2] #north
     x = 0
     y = -0.9
     lx= [0] 
@@ -44,12 +42,7 @@ def wo_location(c_left, c_right, filename):
         
         alfa = atan2(c_left_diff[i]-c_right_diff[i], 2*wdt/dpp)
         heading.append(heading[-1] - 2*alfa)
-        
 
-        #d1 = wdt/2 - cos(alfa)*wdt/2
-        #d2 = sin(alfa)*wdt/2
-        #d = sqrt(d1*d1 + d2*d2)
-        
         d = dpp/2 * (c_left_diff[i] + c_right_diff[i])
 
         x += d*cos(heading[-1])
@@ -58,16 +51,9 @@ def wo_location(c_left, c_right, filename):
         camy.append(y + campos*sin(heading[-1]))
         lx.append(x)
         ly.append(y)
-        #print( x, y)
+        
     
-    #print([lx, ly])
-    #plt.plot(lx, ly)
-    #plt.plot(camx, camy)
-    #plt.grid()
-    #plt.axis('equal')
-    #plt.title(filename)
-    #plt.show()a
-    return camx, camy
+    return camx, camy, heading
 
 #c_left = [i for i in range(110)]
 #c_right = [0 for i in range(110)]
