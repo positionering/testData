@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.1.0)
 project(pose-grej)
 
 # Find librealsense2 installed package
+find_package (Eigen3 3.3 REQUIRED)
 find_package(realsense2 REQUIRED)
 
 # Enable C++11
@@ -16,4 +17,4 @@ SET(CMAKE_CXX_FLAGS  "-Wno-narrowing")
 add_executable(pose realsense-pose.cpp)
 
 # Link librealsense2 to the target
-target_link_libraries(pose ${realsense2_LIBRARY})
+target_link_libraries(pose ${realsense2_LIBRARY} Eigen3::Eigen)
