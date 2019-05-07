@@ -12,8 +12,8 @@ from path_from_wheel_speed import path_from_wheel_speed
 
 
 
-list_of_files_t265 = sorted(glob.glob('test/t265/var*'))
-list_of_files_cords = sorted(glob.glob('test/cord/var*'))
+list_of_files_t265 = sorted(glob.glob('test/t265/*'))
+list_of_files_cords = sorted(glob.glob('test/cord/*'))
 
 
 filelist = ['test/cord/test18.log', 'test/t265/test18_1.log', 'test/heading/test6U.log']
@@ -98,6 +98,16 @@ with open(filename_T265, 'r') as f:
 
 
     
+    offset_x = x_gnss[0]
+    offset_z = z_gnss[0]
+    x_gnss = np.array(x_gnss)
+    z_gnss = np.array(z_gnss)
+
+    x_gnss = x_gnss - offset_x
+    z_gnss = z_gnss - offset_z
+
+    plt.plot(x_gnss, z_gnss, label='Route from RTK')
+
     wo_x, wo_y, wo_heading = wo_location(tic_l, tic_r, ' ')
     
     x_T265 = np.array(x_T265)
