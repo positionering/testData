@@ -9,7 +9,9 @@
 
 class serial{
 public:
-serial(std::string dev ){
+
+
+void init(std::string dev ){
     fd = open(dev.c_str(), O_RDWR | O_NOCTTY );
     if (fd <0) {perror(dev.c_str()); exit(-1); } 
     // Improvement No. 1 I save old setting and clean the new one 
@@ -43,6 +45,7 @@ serial(std::string dev ){
     tcflush(fd, TCIFLUSH);
     tcsetattr(fd,TCSANOW,&newtio);
 }
+
 ~serial(){
     close(fd);
 }

@@ -10,8 +10,8 @@ from sensor_location_smooth import *
 
 
 
-list_of_files_t265 = sorted(glob.glob('test/t265/test18F*'))
-list_of_files_cords = sorted(glob.glob('test/cord/test18F*'))
+list_of_files_t265 = sorted(glob.glob('test/t265/ut*'))
+list_of_files_cords = sorted(glob.glob('test/cord/ut*'))
 
 
 
@@ -51,6 +51,8 @@ for counter, t265_file in enumerate(list_of_files_t265):
         f = f.readlines()
        # del f[-1]
         for line in f:
+            
+            
             lat = line.split(' ')[3]
             lon = line.split(' ')[5]
             #tid, lat, lon = line.split(' ')
@@ -115,14 +117,14 @@ for counter, t265_file in enumerate(list_of_files_t265):
     x_gnss = x_gnss - offset_x
     z_gnss = z_gnss - offset_z
 
-    camx, camy = wo_location(tic_l, tic_r, 'Hjuldata from test: ' + t265_file)
+    wo_camx, wo_camy, wo_heading = wo_location(tic_l, tic_r, ' ')
 
     x_T265 = np.array(x_T265)
     z_T265 = np.array(z_T265)
     fig = plt.figure()
     plt.plot(x_T265, z_T265, label='Route from T265')
     plt.plot(x_gnss, z_gnss, label='Route from RTK')
-    plt.plot(camx, camy, label='Route from wheel odometry')
+    plt.plot(wo_camx, wo_camy, label='Route from wheel odometry')
 
     plt.legend()
     plt.axis('equal')
@@ -131,6 +133,7 @@ for counter, t265_file in enumerate(list_of_files_t265):
     plt.ylabel('m')
 
     plt.savefig("figs/"+t265_file.split("/")[2]+".png")
+    plt.show()
     plt.close(fig)
     
     #plottar hjulhastigheten
