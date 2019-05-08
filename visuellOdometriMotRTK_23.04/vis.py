@@ -10,8 +10,8 @@ from sensor_location_smooth import *
 
 
 
-list_of_files_t265 = sorted(glob.glob('test/t265/ut*'))
-list_of_files_cords = sorted(glob.glob('test/cord/ut*'))
+list_of_files_t265 = sorted(glob.glob('test/t265/*'))
+list_of_files_cords = sorted(glob.glob('test/cord222/*'))
 
 
 
@@ -49,7 +49,7 @@ for counter, t265_file in enumerate(list_of_files_t265):
     
     with open(cords_file, 'r') as f:
         f = f.readlines()
-       # del f[-1]
+        del f[-1]
         for line in f:
             
             
@@ -132,7 +132,7 @@ for counter, t265_file in enumerate(list_of_files_t265):
     plt.xlabel('m')
     plt.ylabel('m')
 
-    plt.savefig("figs/"+t265_file.split("/")[2]+".png")
+    plt.savefig("figs/route/"+t265_file.split("/")[2]+".png")
     plt.show()
     plt.close(fig)
     
@@ -147,7 +147,7 @@ for counter, t265_file in enumerate(list_of_files_t265):
     plt.xlabel('s')
     plt.ylabel('m/s')
 
-    plt.savefig("figs/"+"hjulhastighet "+t265_file.split("/")[2]+".png")
+    plt.savefig("figs/hjulhastighet/"+"hjulhastighet "+t265_file.split("/")[2]+".png")
     plt.close(fig2)
     
     # Plott hjulhastigheter och T-265 hastighet i 3D
@@ -174,25 +174,21 @@ for counter, t265_file in enumerate(list_of_files_t265):
     ax.legend()
   
     
-    plt.savefig("figs/"+"3d-hjulhastighet och T265-hastighet "+t265_file.split("/")[2]+".png")
+    plt.savefig("figs/3dhjul/"+"3d-hjulhastighet och T265-hastighet "+t265_file.split("/")[2]+".png")
     plt.close(fig3D)
     
     #Plott T-265 hastighet i 3d
     """
     fig3D_2 = plt.figure()
     ax = fig3D_2.gca(projection='3d')
-
     v_l3D_2 = np.array([v_T265_x,v_T265_z,t])
     v_l3D_2 = v_l3D_2.T
-
     ax.plot(v_l3D_2[:,0],v_l3D_2[:,1],v_l3D_2[:,2], label='T265')
     plt.title('3D-Hjulhastighet from test: ' + t265_file)
     ax.legend()
     plt.show()
-
     plt.savefig("figs/"+"3d-t265 hastighet "+t265_file.split("/")[2]+".png")
     
-
     
     plt.close(fig3D_2)"""
 
@@ -209,12 +205,5 @@ for counter, t265_file in enumerate(list_of_files_t265):
     plt.xlabel('s')
     plt.ylabel('m/s')
 
-    plt.savefig("figs/"+"Pulser "+t265_file.split("/")[2]+".png")
+    plt.savefig("figs/pulser/"+"Pulser "+t265_file.split("/")[2]+".png")
     plt.close(fig3)
-
-    
-
-    
-    
-
-

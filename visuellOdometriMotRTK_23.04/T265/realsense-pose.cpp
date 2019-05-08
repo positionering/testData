@@ -81,10 +81,10 @@ int main(int argc, char * argv[]) try {
         
         serial s;
         
-        if(strcmp(argv[1],"1") == 0){
+    //    if(strcmp(argv[1],"1") == 0){
         s.init("/dev/ttyACM0");
         
-        }
+    //    }
         rs2::pipeline pipe;
         rs2::config cfg;
         rotation_estimator algo;
@@ -105,14 +105,15 @@ int main(int argc, char * argv[]) try {
        
        if(calibrationFile.fail()){
         calibrationFile.close();
-        calibrationFile.open("T265/forward_calib.json");
+        calibrationFile.open("T265/rightward_calib.json");
         }
        
        if(calibrationFile.fail()){
         calibrationFile.close();
         calibrationFile.open("../forward_calib.json");
-        } else {
-          std::cout << "kunde inte hitta json filen" << std::endl;
+        }
+        if(calibrationFile.fail()){
+         std::cout << "kunde inte hitta json filen" << std::endl;
           return 0;
         }
         
@@ -142,11 +143,12 @@ int main(int argc, char * argv[]) try {
         int count1 = 0;
         int count2 = 0;
         
-        float Tcon = 1;
+        const float Tcon = 0.05;
         float vfilt_old1 = 0;
         float vfilt_old2 = 0;
         
         auto old_start = std::chrono::system_clock::now();
+        
         while (true) {
             
             //testa att göra if satser på alla dessa för att kontrollera vilken frame det igentligen är!
@@ -174,16 +176,17 @@ int main(int argc, char * argv[]) try {
               
             rs2_vector accel_data = accel_f.get_motion_data();
             algo.process_accel(accel_data);
-          if(strcmp(argv[1],"1") == 0){
+      //    if(strcmp(argv[1],"1") == 0){
 	        do{
 	            temp = s.sread();
 	        } while(temp.size()< 9);
-	       }
+	     //  }
 		 
-		   //  double thetaGrejFromCos = acos(pose_data.velocity.x / (abs(pose_data.velocity.x)+abs(pose_data.velocity.z)));
-		   //  double thetaGrejFromSin = asin(pose_data.velocity.z / (abs(pose_data.velocity.x)+abs(pose_data.velocity.z)));
+		     //double thetaGrejFromCos = acos(pose_data.velocity.x / (abs(pose_data.velocity.x)+abs(pose_data.velocity.z)));
+		     //double thetaGrejFromSin = asin(pose_data.velocity.z / (abs(pose_data.velocity.x)+abs(pose_data.velocity.z)));
 
-
+        //double theta =  atan2(pose_data.velocity.z,pose_data.velocity.x);        
+        
 
         //  auto quat = Eigen::Quaternion<double>(pose_data.rotation.w,pose_data.rotation.x,pose_data.rotation.y,pose_data.rotation.z);
         //    auto rot = quat.toRotationMatrix();
@@ -192,12 +195,14 @@ int main(int argc, char * argv[]) try {
 
 		     double theta = (PI/2)+algo.get_theta().y;
 		    
+		   // std::cout << "vinkelfr: " << vinkelfr << "   theta: " << theta<< std::endl; 
+		    
 		   // std::cout << -euler(1)*(180/PI) << std::endl;
 		    
 		   // std::cout << (theta - (PI/2)-PI)*(180/PI) << std::endl; 
 		    
 	      	//std::this_thread::sleep_for(std::chrono::milliseconds(100));	
-	        std::cout << temp << std::endl;
+	        //std::cout << temp << std::endl;
 	        //std::cout << temp.size() << std::endl;
 	        if(temp.size() > 9){
             //std::cout << "Hastighet " << temp << std::endl;
@@ -210,7 +215,7 @@ int main(int argc, char * argv[]) try {
 		            count2 = std::stof (temp.substr(sz+sz1+sz2));
 		            
 		            auto start = std::chrono::system_clock::now();
-		            std::chrono::duration<float> elapSec = start-old_start;
+		            std::chrono::duration<float> elapSec = (start-old_start)/1000;
 		            auto old_start = start;
 		            
 		            speed1 = vfilt(speed1, vfilt_old1, elapSec.count(), Tcon);
@@ -222,8 +227,12 @@ int main(int argc, char * argv[]) try {
               //  std::cout << speed1 << " " << speed2 << std::endl;
                 
 		            //FORWARD
-		            sp1 = {cos(theta) * speed1, 0, sin(theta) * speed1 };
-		            sp2 = {cos(theta) * speed2, 0, sin(theta) * speed2 };
+		            //sp1 = {cos(theta) * speed1, 0, sin(theta) * speed1 };
+		            //sp2 = {cos(theta) * speed2, 0, sin(theta) * speed2 };
+		            
+		            //RIGHTWARD
+		            sp1 = {sin(theta) * speed1, 0, cos(theta) * speed1 };
+		            sp2 = {sin(theta) * speed2, 0, cos(theta) * speed2 };
 		              
 		            sp1_o = sp1;
 		            sp2_o = sp2;
@@ -258,8 +267,8 @@ int main(int argc, char * argv[]) try {
         //                                                                      << "   sin,z: " << cos(euler(1)) << " " << pose_data.velocity.z << std::endl;
 
             
-           // std::cout << std::setprecision(3) << std::fixed << theta*(180/PI) << "   cos,x: " << cos(theta) << " " << pose_data.velocity.x 
-           //                                                                   << "   sin,z: " << sin(theta) << " " << pose_data.velocity.z << std::endl;
+        //    std::cout << std::setprecision(3) << std::fixed << theta*(180/PI) << "   cos,x: " << cos(theta) << " " << pose_data.velocity.x 
+        //                                                                      << "   sin,z: " << sin(theta) << " " << pose_data.velocity.z << std::endl;
  
            
             std::cout   << std::setprecision(3) << std::fixed << 
