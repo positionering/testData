@@ -6,12 +6,13 @@ import utm
 import math
 import glob
 import os
-from sensor_location_smooth import *
+from sensor_location_smooth import array_smoothing, wo_location
+from path_from_wheel_speed import path_from_wheel_speed
 
 
 
-list_of_files_t265 = sorted(glob.glob('test/t265/*'))
-list_of_files_cords = sorted(glob.glob('test/cord222/*'))
+list_of_files_t265 = sorted(glob.glob('test/t265/*.log'))
+list_of_files_cords = sorted(glob.glob('test/cord222/*.log'))
 
 
 
@@ -76,13 +77,13 @@ for counter, t265_file in enumerate(list_of_files_t265):
             t.append(float(line.split(' ')[1]) - t_first)
             
             #höger hjulhastighet
-            #v_x = float(line.split()[22].strip(","))
-            #v_y = float(line.split()[23].strip(","))
-            #v_z = float(line.split()[24].strip(","))
+            v_x = float(line.split()[22].strip(","))
+            v_y = float(line.split()[23].strip(","))
+            v_z = float(line.split()[24].strip(","))
             
-            #v_rx.append(v_x)
-            #v_ry.append(v_z)
-            #v_r.append(math.sqrt(v_x**2+v_y**2+v_z**2))
+            v_rx.append(v_x)
+            v_ry.append(v_z)
+            v_r.append(math.sqrt(v_x**2+v_y**2+v_z**2))
           
 
             #vänster hjulhastighet
@@ -119,12 +120,18 @@ for counter, t265_file in enumerate(list_of_files_t265):
 
     wo_camx, wo_camy, wo_heading = wo_location(tic_l, tic_r, ' ')
 
+    wo_l = path_from_wheel_speed(np.array([-np.array(v_lx), v_ly]), np.array(t), [1.08/2, 0])
+    wo_r = path_from_wheel_speed(np.array([-np.array(v_rx), v_ry]), np.array(t), [-1.08/2, 0])
+
     x_T265 = np.array(x_T265)
     z_T265 = np.array(z_T265)
     fig = plt.figure()
     plt.plot(x_T265, z_T265, label='Route from T265')
     plt.plot(x_gnss, z_gnss, label='Route from RTK')
-    plt.plot(wo_camx, wo_camy, label='Route from wheel odometry')
+    plt.plot(wo_camx, wo_camy, label='Route from wheel odometry (ticks)')
+    plt.plot(wo_l[:, 0], wo_l[:, 1], label='Route left wheel (speed)')
+    plt.plot(wo_r[:, 0], wo_r[:, 1], label='Route right wheel (speed)')
+
 
     plt.legend()
     plt.axis('equal')
