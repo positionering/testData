@@ -143,7 +143,7 @@ for i,t265_file in enumerate(t265_list_of_files):
     
     
     #Fix GNSS date, angle + center
-    gnss_data = fix_GPSdata(np.array([f_interp_223_x,f_interp_223_z]).T, np.array([f_interp_222_x,f_interp_222_z]).T).T
+    gnss_data = fix_GPSdata(np.array([f_interp_223_x,f_interp_223_z]).T, np.array([f_interp_222_x,f_interp_222_z]).T, 100).T
     print(gnss_data.shape)
 
     #t265 error
