@@ -194,8 +194,11 @@ for t265_file, gnss_file_l, gnss_file_r in zip(list_of_files_t265, list_of_files
     # Plot 3: VEL Hjulhastighet mot tid
     fig3 = plt.figure()
 
-    # plt.plot(t, wo_v_l, label='Vänster hjul')
-    # plt.plot(t, wo_v_r, label='Höger hjul')
+    wo_v_l = [np.linalg.norm([x,y,z]) for x, y, z in zip(wo_v_l_x, wo_v_l_y, wo_v_l_z)]
+    wo_v_r = [np.linalg.norm([x,y,z]) for x, y, z in zip(wo_v_r_x, wo_v_r_y, wo_v_r_z)]
+        
+    plt.plot(t, wo_v_l, label='Vänster hjul')
+    plt.plot(t, wo_v_r, label='Höger hjul')
     
     plt.title('Hastighet enligt hjulodometri från test:' + t265_file)
     plt.xlabel('Tid [ms]')
