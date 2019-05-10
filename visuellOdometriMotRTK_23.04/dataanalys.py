@@ -14,6 +14,8 @@ list_of_files_t265 = sorted(glob.glob('test/t265/*.log')) # TODO: Mappstruktur, 
 list_of_files_gnss_l = sorted(glob.glob('test/cord222/*.log'))
 list_of_files_gnss_r = sorted(glob.glob('test/cord223/*.log'))
 
+print(len(list_of_files_t265), len(list_of_files_gnss_l), len(list_of_files_gnss_r))
+
 for t265_file, gnss_file_l, gnss_file_r in zip(list_of_files_t265, list_of_files_gnss_l, list_of_files_gnss_r):
     
 
@@ -192,8 +194,8 @@ for t265_file, gnss_file_l, gnss_file_r in zip(list_of_files_t265, list_of_files
     # Plot 3: VEL Hjulhastighet mot tid
     fig3 = plt.figure()
 
-    plt.plot(t, wo_v_l, label='Vänster hjul')
-    plt.plot(t, wo_v_r, label='Höger hjul')
+    # plt.plot(t, wo_v_l, label='Vänster hjul')
+    # plt.plot(t, wo_v_r, label='Höger hjul')
     
     plt.title('Hastighet enligt hjulodometri från test:' + t265_file)
     plt.xlabel('Tid [ms]')
