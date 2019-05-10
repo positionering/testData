@@ -3,27 +3,24 @@ import numpy as np
 
 def fix_GPSdata(GPSdataV, GPSdataH):
     heading = GPSdataV[0,:] -  GPSdataH[0,:]
-    
+
     heading = unit_vector(heading)
 
     heading = np.array([[0, 1], [-1, 0]]) @ heading
 
     theta = angle_between(heading, np.array([0,1]))
 
-    theta = angle_between(np.array([1,0]), np.array([0,1]))
-
     GPSdataV = center_data(GPSdataV)
     GPSdataH = center_data(GPSdataH)
 
     GPSdata = (GPSdataV + GPSdataH)/2
-
     return rotate_2Ddata(GPSdata, theta)
 
 
 def rotate_2Ddata(data, angle):
     rot = np.array([[np.cos(angle), -np.sin(angle)],
                     [np.sin(angle), np.cos(angle)]])
-    np.apply_along_axis(lambda arr: rot@arr, axis=1, arr=data)
+    return np.apply_along_axis(lambda arr: rot@arr, axis=1, arr=data)
 
 
 def unit_vector(vector):
