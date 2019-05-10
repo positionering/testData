@@ -1,12 +1,12 @@
 import numpy as np
 
 
-def fix_GPSdata(GPSdataV, GPSdataH):
-    heading = GPSdataV[0,:] -  GPSdataH[0,:]
+def fix_GPSdata(GPSdataV, GPSdataH, medel = 1):
 
-    heading = unit_vector(heading)
-
-    heading = np.array([[0, 1], [-1, 0]]) @ heading
+    heading = np.array([[0,0]])
+    for i in range(medel):
+         heading = heading + (np.array([[0, 1], [-1, 0]]) @ unit_vector(GPSdataV[i,:] -  GPSdataH[i,:]))
+    heading = heading / medel
 
     theta = angle_between(heading, np.array([0,1]))
     theta = np.copysign(theta, np.cross(heading, np.array([0,1])))
@@ -48,7 +48,7 @@ def main():
     path2 = np.array([[0,4,3,53,2,23,35],
                       [-1,-1,-1,-1,-1,-1,-1]]).T
 
-    print(fix_GPSdata(path1, path2))
+    print(fix_GPSdata(path1, path2, 3))
     print(center_data(t))
 
 
