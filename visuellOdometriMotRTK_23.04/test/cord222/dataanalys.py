@@ -6,8 +6,8 @@ import utm
 import math
 import glob
 import os
-from sensor_location_smooth import *
-from rotate_data import rotate_data, center_data
+from sensor_location_smooth import array_smoothing, wo_location
+from rotate_data import fix_GPSdata, center_data, rotate_data
 
 # Filenames 
 list_of_files_t265 = sorted(glob.glob('sluttest/t265/*')) # TODO: Mappstruktur, filnamn
@@ -88,11 +88,10 @@ for t265_file, gnss_file in t265_list_of_files, gnss_list_of_files:
     t -= t[0]
 
     # Calculate path from wo-tics
-    wo_pos_x, wo_pos_y = wo_location(wo_tic_l, wo_tic_r, ' ')
+    wo_pos_x, wo_pos_y = wo_location(wo_tic_l, wo_tic_r, ' ')gnss_pos_x, gnss_pos_z,
 
     # Defining the origo for gnss values
-    gnss_pos_x -= gnss_pos_x[0]
-    gnss_pos_z -= gnss_pos_z[0]
+    gnss_pos = fix_GPSdata(np.array([gnss_pos_x_l, gnss_pos_y_h]), np.array([gnss_pos_x_r, gnss_pos_y_r]))
 
 
     ### PLOTTING ###

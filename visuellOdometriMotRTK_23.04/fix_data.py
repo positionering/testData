@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def rotate_GPSdata(GPSdataV, GPSdataH):
+def fix_GPSdata(GPSdataV, GPSdataH):
     heading = GPSdataV[0,:] -  GPSdataH[0,:]
     
     heading = unit_vector(heading)
