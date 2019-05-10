@@ -10,9 +10,9 @@ from sensor_location_smooth import array_smoothing, wo_location
 from fix_data import fix_GPSdata, center_data, rotate_2Ddata
 
 # Filenames 
-list_of_files_t265 = sorted(glob.glob('test/t265/*.log')) # TODO: Mappstruktur, filnamn
-list_of_files_gnss_l = sorted(glob.glob('test/cord222/*.log'))
-list_of_files_gnss_r = sorted(glob.glob('test/cord223/*.log'))
+list_of_files_t265 = sorted(glob.glob('test/t265/190508cirkelF*.log')) # TODO: Mappstruktur, filnamn
+list_of_files_gnss_l = sorted(glob.glob('test/cord223/190508cirkelF*.log'))
+list_of_files_gnss_r = sorted(glob.glob('test/cord222/190508cirkelF*.log'))
 
 print(len(list_of_files_t265), len(list_of_files_gnss_l), len(list_of_files_gnss_r))
 
@@ -93,7 +93,7 @@ for t265_file, gnss_file_l, gnss_file_r in zip(list_of_files_t265, list_of_files
 
             # t265, TODO: Datastruktur
             t265_pos_x.append(float(line.split()[3]))
-            t265_pos_z.append(float(line.split()[5]))
+            t265_pos_z.append(-float(line.split()[5])) # speglar runt x
             t265_v_x.append(float(line.split()[18]))
             t265_v_z.append(float(line.split()[16].strip(',')))
 
