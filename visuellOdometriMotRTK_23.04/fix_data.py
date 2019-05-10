@@ -9,6 +9,7 @@ def fix_GPSdata(GPSdataV, GPSdataH):
     heading = np.array([[0, 1], [-1, 0]]) @ heading
 
     theta = angle_between(heading, np.array([0,1]))
+    theta = np.copysign(theta, np.cross(heading, np.array([0,1])))
 
     GPSdataV = center_data(GPSdataV)
     GPSdataH = center_data(GPSdataH)
@@ -47,7 +48,7 @@ def main():
     path2 = np.array([[0,4,3,53,2,23,35],
                       [-1,-1,-1,-1,-1,-1,-1]]).T
 
-    print(rotate_GPSdata(path1, path2))
+    print(fix_GPSdata(path1, path2))
     print(center_data(t))
 
 
