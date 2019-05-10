@@ -12,15 +12,18 @@ def rotate_GPSdata(GPSdataV, GPSdataH):
 
     theta = angle_between(np.array([1,0]), np.array([0,1]))
 
-    rot = np.array([[np.cos(theta), -np.sin(theta)],
-                    [np.sin(theta), np.cos(theta)]])
-
     GPSdataV = center_data(GPSdataV)
     GPSdataH = center_data(GPSdataH)
 
     GPSdata = (GPSdataV + GPSdataH)/2
 
-    return np.apply_along_axis(lambda arr: rot@arr, axis=1, arr=GPSdata)
+    return rotate_2Ddata(GPSdata, theta)
+
+
+def rotate_2Ddata(data, angle):
+    rot = np.array([[np.cos(angle), -np.sin(angle)],
+                    [np.sin(angle), np.cos(angle)]])
+    np.apply_along_axis(lambda arr: rot@arr, axis=1, arr=data)
 
 
 def unit_vector(vector):
