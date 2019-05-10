@@ -19,7 +19,7 @@ def wo_location(c_left, c_right, filename):
     wdt = 1.08
     campos = 0.9
    
-    heading = [-3.14/2] #north
+    heading = [3.14/2] #north
     x = 0
     y = 0.9
     lx= [0] 
