@@ -10,10 +10,11 @@ from sensor_location_smooth import *
 from rotate_data import rotate_data, center_data
 
 # Filenames 
-list_of_files_t265 = sorted(glob.glob('sluttest/t265/*')) # TODO: Mappstruktur, filnamn
-list_of_files_gnss = sorted(glob.glob('sluttest/cord/*'))
+list_of_files_t265 = sorted(glob.glob('test/t265/*')) # TODO: Mappstruktur, filnamn
+list_of_files_gnss_l = sorted(glob.glob('test/cord222/*'))
+list_of_files_gnss_r = sorted(glob.glob('test/cord223/*'))
 
-for t265_file, gnss_file in t265_list_of_files, gnss_list_of_files:
+for t265_file, gnss_file_l, gnss_file_r in t265_list_of_files, gnss_list_of_files_l, gnss_list_of_files_r:
     
 
     ### PREDEF ###
@@ -22,8 +23,11 @@ for t265_file, gnss_file in t265_list_of_files, gnss_list_of_files:
     t = np.array()
 
     # GNSSdata
-    gnss_pos_x = np.array()
-    gnss_pos_z = np.array()
+    gnss_pos_x_r = np.array()
+    gnss_pos_z_r = np.array()
+    
+    gnss_pos_x_l = np.array()
+    gnss_pos_z_l = np.array()
 
     # Camera data
     t265_pos_x = np.array()
@@ -36,50 +40,61 @@ for t265_file, gnss_file in t265_list_of_files, gnss_list_of_files:
     wo_tic_r = np.array()
     wo_tic_l = np.array()
 
-    wo_v_r = np.array()
-    wo_v_rx = np.array()
-    wo_v_ry = np.array()
+    wo_v_r_x = np.array()
+    wo_v_r_y = np.array()
+    wo_v_r_z = np.array()
 
-    wo_v_l = np.array()
-    wo_v_lx = np.array()
-    wo_v_ly = np.array()
+
+    wo_v_l_x = np.array()
+    wo_v_l_y = np.array()
+    wo_v_l_z = np.array()
+
 
 
     ### RETRIEVE DATA ###
 
-    # From gnss
-    with open(gnss_file, 'r') as f:
+    # From left gnss 
+    with open(gnss_file_l, 'r') as f:
         for line in f:
-            lat = line.split(' ')[3]
-            lon = line.splot(' ')[5]
-            u = utm.from_latlong(float(lat), float(lon))
-            gnss_pos_x.append(u[0])
-            gnss_pos_z.append(u[1])
+            lat_l = line.split(' ')[3]
+            lon_l = line.splot(' ')[5]
+            u = utm.from_latlong(float(lat_l), float(lon_l))
+            gnss_pos_x_l.append(u[0])
+            gnss_pos_z_l.append(u[1])
     
+    # From right gnss
+    with open(gnss_file_r, 'r') as f:
+        for line in f:
+            lat_r = line.split(' ')[3]
+            lon_r = line.splot(' ')[5]
+            u = utm.from_latlong(float(lat_r), float(lon_r))
+            gnss_pos_x_r.append(u[0])
+            gnss_pos_z_r.append(u[1])
+
     # From t265, wheel odometry
     with open(t265_file, 'r') as f:
         for line in f:
             
             # time
-            t.append()
+            t.append(float(line.split()[1]))
 
             # t265, TODO: Datastruktur
-            t265_pos_x.append(float())
-            t265_pos_z.append(float())
-            t265_v_x.append(float())
-            t265_v_z.append(float())
+            t265_pos_x.append(float(line.split()[3]))
+            t265_pos_z.append(float(line.split()[5]))
+            t265_v_x.append(float(line.split([18])))
+            t265_v_z.append(float(line.split()[16]))
 
             # wheel odometry, TODO:
-            wo_tic_l.append(float())
-            wo_tic_r.append(float())
+            wo_tic_l.append(float(line.split([19])))
+            wo_tic_r.append(float(line.split()[20]))
 
-            wo_v_l.append(float())
-            wo_v_lx.append(float())
-            wo_vly.append(float())
+            wo_v_l_x.append(float(line.split()[11]))
+            wo_v_l_y.append(float(line.split()[12]))
+            wo_v_l_z.append(float(line.split()[13]))
 
-            wo_v_r.append(float())
-            wo_v_rx.append(float())
-            wo_v_ry.append(float())
+            wo_v_r_x.append(float(line.split()[22]))
+            wo_v_r_y.append(float(line.split()[23]))
+            wo_v_r_z.append(float(line.split()[24]))
     
 
     ### Data calculations ###
