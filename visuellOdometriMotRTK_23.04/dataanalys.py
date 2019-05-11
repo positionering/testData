@@ -146,10 +146,10 @@ for t265_file, gnss_file_l, gnss_file_r in zip(list_of_files_t265, list_of_files
     t -= t[0]
 
     # Calculate path from wo-tics
-    wo_pos_x, wo_pos_z, _ = wo_location(wo_tic_l, wo_tic_r, ' ')
+    wo_pos_x, wo_pos_z, wo_headidng = wo_location(wo_tic_l, wo_tic_r, ' ')
 
     # Defining the origo for gnss values
-    gnss_pos = fix_GPSdata(np.array([gnss_pos_x_l, gnss_pos_z_l]).T, np.array([gnss_pos_x_r, gnss_pos_z_r]).T)
+    gnss_pos = fix_GPSdata(np.array([gnss_pos_x_l, gnss_pos_z_l]).T, np.array([gnss_pos_x_r, gnss_pos_z_r]).T, 200)
 
     ### PLOTTING ###
 
