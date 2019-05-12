@@ -11,7 +11,7 @@ def fix_GPSdata(GPSdataV, GPSdataH, medel = 1, version = 1):
 
     GPSdata = (GPSdataV + GPSdataH)/2
     if version == 2:
-        i = 0
+        i = 1
         while np.linalg.norm(GPSdata[i,:]) < medel:
             i += 1
         heading = headingV2(GPSdata, i)
