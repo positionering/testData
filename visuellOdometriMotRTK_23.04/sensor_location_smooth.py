@@ -1,4 +1,4 @@
-from math import acos, asin, cos, sin, sqrt, atan2
+from math import acos, asin, cos, sin, sqrt, atan2, pi
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -15,11 +15,11 @@ def array_smoothing(x):
 
 
 def wo_location(c_left, c_right, filename):
-    dpp = 0.55*3.14/29
+    dpp = 0.55*pi/29
     wdt = 1.08
     campos = 0.9
    
-    heading = [3.14/2] #north
+    heading = [pi/2] #north
     x = 0
     y = 0.9
     lx= [0] 
