@@ -21,9 +21,9 @@ def wo_location(c_left, c_right, filename):
    
     heading = [pi/2] #north
     x = 0
-    y = 0.9
+    y = -0.9
     lx= [0] 
-    ly = [0.9]
+    ly = [-0.9]
     camx = [0]
     camy = [0]
 
