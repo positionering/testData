@@ -11,9 +11,10 @@ def fix_GPSdata(GPSdataV, GPSdataH, medel = 1, version = 1):
 
     GPSdata = (GPSdataV + GPSdataH)/2
     if version == 2:
-        heading = headingV2(GPSdata, medel)
-
-    print(heading)
+        i = 0
+        while np.linalg.norm(GPSdata[i,:]) < medel:
+            i += 1
+        heading = headingV2(GPSdata, i)
 
     theta = angle_between(heading, np.array([0,1]))
     theta = np.copysign(theta, np.cross(heading, np.array([0,1])))
@@ -32,9 +33,9 @@ def headingV1(GPSdataV, GPSdataH, medel):
 def headingV2(GPSdata, medel):
     heading = np.array([0,0])
     for i in range(medel):
-        for j in range(i, medel):
+        for j in range(i+1, medel):
             heading = heading + (GPSdata[j,:] - GPSdata[i,:])
-    heading = unit_vector(heading / medel**2)
+    heading = unit_vector(heading)
     return heading
 
 
@@ -63,12 +64,12 @@ def angle_between(v1, v2):
 
 def main():
     t = np.array([5,6,7,9,12,34,45]).T
-    path1 = np.array([[0,4,3,53,2,23,35],
+    path1 = np.array([[0,0.4,0.3,5.3,0.2,2.3,3.5],
                       [1,1,1,1,1,1,1]]).T
-    path2 = np.array([[0,4,3,53,2,23,35],
+    path2 = np.array([[0,0.4,0.3,5.3,0.2,2.3,3.5],
                       [-1,-1,-1,-1,-1,-1,-1]]).T
 
-    print(fix_GPSdata(-path1, -path2, 3))
+    print(fix_GPSdata(-path1, -path2, 1, 2))
     print(center_data(t))
 
 
