@@ -1,23 +1,41 @@
 import numpy as np
 
 
-def fix_GPSdata(GPSdataV, GPSdataH, medel = 1):
+def fix_GPSdata(GPSdataV, GPSdataH, medel = 1, version = 1):
 
-    heading = np.array([0,0])
-    for i in range(medel):
-         heading = heading + (np.array([[0, 1], [-1, 0]]) @ unit_vector(GPSdataV[i,:] -  GPSdataH[i,:]))
-    heading = heading / medel
-
-
-
-    theta = angle_between(heading, np.array([0,1]))
-    theta = np.copysign(theta, np.cross(heading, np.array([0,1])))
+    if version == 1:
+        heading = headingV1(GPSdataV, GPSdataH, medel)
     
     GPSdataV = center_data(GPSdataV)
     GPSdataH = center_data(GPSdataH)
 
     GPSdata = (GPSdataV + GPSdataH)/2
+    if version == 2:
+        heading = headingV2(GPSdata, medel)
+
+    print(heading)
+
+    theta = angle_between(heading, np.array([0,1]))
+    theta = np.copysign(theta, np.cross(heading, np.array([0,1])))
+  
     return rotate_2Ddata(GPSdata, theta)
+
+
+def headingV1(GPSdataV, GPSdataH, medel):
+    heading = np.array([0,0])
+    for i in range(medel):
+         heading = heading + (np.array([[0, 1], [-1, 0]]) @ unit_vector(GPSdataV[i,:] - GPSdataH[i,:]))
+    heading = heading / medel
+    return heading
+
+
+def headingV2(GPSdata, medel):
+    heading = np.array([0,0])
+    for i in range(medel):
+        for j in range(i, medel):
+            heading = heading + (GPSdata[j,:] - GPSdata[i,:])
+    heading = unit_vector(heading / medel**2)
+    return heading
 
 
 def rotate_2Ddata(data, angle):
@@ -50,7 +68,7 @@ def main():
     path2 = np.array([[0,4,3,53,2,23,35],
                       [-1,-1,-1,-1,-1,-1,-1]]).T
 
-    print(fix_GPSdata(path1, path2, 3))
+    print(fix_GPSdata(-path1, -path2, 3))
     print(center_data(t))
 
 

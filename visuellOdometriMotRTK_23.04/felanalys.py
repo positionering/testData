@@ -9,12 +9,14 @@ import os
 from sensor_location_smooth import *
 from fix_data import *
 from scipy.interpolate import interp1d
+from scipy.integrate import trapz
 
 
 
-t265_list_of_files = sorted(glob.glob('test/t265/190508cirkelF*')) 
-gnss222_list_of_files = sorted(glob.glob('test/cord222/190508cirkelF*'))
-gnss223_list_of_files = sorted(glob.glob('test/cord223/190508cirkelF*'))
+
+t265_list_of_files = sorted(glob.glob('test/t265/190508*F*')) 
+gnss222_list_of_files = sorted(glob.glob('test/cord222/190508*F*'))
+gnss223_list_of_files = sorted(glob.glob('test/cord223/190508*F*'))
 
 print(gnss222_list_of_files)
 print(gnss223_list_of_files)
@@ -124,9 +126,12 @@ for i,t265_file in enumerate(t265_list_of_files):
     
     
     #GNS error
-  
-    gnss_error = abs(np.sqrt( (gnss222_pos_x - gnss223_pos_x )**2 + (gnss222_pos_z - gnss223_pos_z )**2 ) -0.71 )
-    
+    try:
+        gnss_error = abs(np.sqrt( (gnss222_pos_x - gnss223_pos_x )**2 + (gnss222_pos_z - gnss223_pos_z )**2 ) -0.71 )
+    except:
+        print(t265_file)
+        continue
+
     #Interpolate GNSS data
     f_interp_222_x = interp1d(t_222, gnss222_pos_x,fill_value="extrapolate")
     f_interp_222_z = interp1d(t_222, gnss222_pos_z,fill_value="extrapolate")
@@ -134,21 +139,27 @@ for i,t265_file in enumerate(t265_list_of_files):
     f_interp_223_x = interp1d(t_223, gnss223_pos_x,fill_value="extrapolate")
     f_interp_223_z = interp1d(t_223, gnss223_pos_z,fill_value="extrapolate")
 
-    T = 900
-    f_interp_222_x = f_interp_222_x(t_t265+T)
-    f_interp_222_z = f_interp_222_z(t_t265+T)
-    
-    f_interp_223_x = f_interp_223_x(t_t265+T)
-    f_interp_223_z = f_interp_223_z(t_t265+T)
-    
-    
-    #Fix GNSS date, angle + center
-    gnss_data = fix_GPSdata(np.array([f_interp_223_x,f_interp_223_z]).T, np.array([f_interp_222_x,f_interp_222_z]).T, 100).T
-    print(gnss_data.shape)
+    t265_cum_error = []
+    for T in range(0, 2000, 10):
+        f_interp_222_x_value = f_interp_222_x(t_t265+T)
+        f_interp_222_z_value = f_interp_222_z(t_t265+T)
+        
+        f_interp_223_x_value = f_interp_223_x(t_t265+T)
+        f_interp_223_z_value = f_interp_223_z(t_t265+T)
+        
+        #Fix GNSS date, angle + center
+        gnss_data = fix_GPSdata(np.array([f_interp_223_x_value,f_interp_223_z_value]).T, np.array([f_interp_222_x_value,f_interp_222_z_value]).T, 100).T
 
-    #t265 error
-    t265_error = np.sqrt( (gnss_data[0] - t265_pos[0,:] )**2 + (gnss_data[1] - t265_pos[1,:] )**2 )
-    print(max(t265_error))
+        #t265 error
+        t265_error = np.sqrt( (gnss_data[0] - t265_pos[0,:] )**2 + (gnss_data[1] - t265_pos[1,:] )**2 )
+        t265_cum_error.append(np.array([T, trapz(t265_error, t_t265)]))
+        
+        #print(max(t265_error))
+    
+    t265_cum_error = np.array(t265_cum_error)
+    delay = t265_cum_error[np.argmin(t265_cum_error[:,1]),0]
+    print('----------',delay)
+
     #Wheel odometry error
     #wo_error = 
 
