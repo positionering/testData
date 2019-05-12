@@ -85,15 +85,19 @@ for i,t265_file in enumerate(t265_list_of_files):
             tic_r.append(float(line.split()[20]))
             tic_l.append(float(line.split()[19]))
 
+   #Delete first to fit
+    del t265_pos_x[0]
+    del t_t265[0]
+    del t265_pos_z[0]
+   
+   
     # Wheel odometry position
     wo_pos_x, wo_pos_z, wo_heading_rad = wo_location(tic_l, tic_r, "filename")
 
     wo_pos_x = np.array(wo_pos_x)
     wo_pos_z = np.array(wo_pos_z)
 
-    print("puls")
-    print(len(tic_l))
-    
+
     #time
     t_t265 = np.array(t_t265).T
     t_222 = np.array(t_222).T
@@ -125,7 +129,8 @@ for i,t265_file in enumerate(t265_list_of_files):
     print(t265_pos.shape)
 
 
-    #Calc
+    
+    
 
     #Calculate error:
     
@@ -144,7 +149,7 @@ for i,t265_file in enumerate(t265_list_of_files):
     f_interp_223_x = interp1d(t_223, gnss223_pos_x,fill_value="extrapolate")
     f_interp_223_z = interp1d(t_223, gnss223_pos_z,fill_value="extrapolate")
 
-    t265_cum_error = []
+    
     T = 0
     f_interp_222_x_value = f_interp_222_x(t_t265+T)
     f_interp_222_z_value = f_interp_222_z(t_t265+T)
@@ -153,31 +158,31 @@ for i,t265_file in enumerate(t265_list_of_files):
     f_interp_223_z_value = f_interp_223_z(t_t265+T)
     
     #Fix GNSS date, angle + center
-    gnss_data = fix_GPSdata(np.array([f_interp_223_x_value,f_interp_223_z_value]).T, np.array([f_interp_222_x_value,f_interp_222_z_value]).T, 200, 2).T
+    gnss_data = fix_GPSdata(np.array([f_interp_223_x_value,f_interp_223_z_value]).T, np.array([f_interp_222_x_value,f_interp_222_z_value]).T, 1, 2).T
 
     #t265 error
     t265_error = np.sqrt( (gnss_data[0] - t265_pos[0,:] )**2 + (gnss_data[1] - t265_pos[1,:] )**2 )
-    t265_cum_error.append(np.array([T, trapz(t265_error, t_t265)]))
+    
     
     #print(max(t265_error))
-
-    t265_cum_error = np.array(t265_cum_error)
-    delay = t265_cum_error[np.argmin(t265_cum_error[:,1]),0]
     #print('----------',delay)
 
     #Wheel odometry error
-    #wo_error = 
-
+    wo_error = np.sqrt( (gnss_data[0] - wo_pos_x )**2 + (gnss_data[1] - wo_pos_z )**2 )
 
         
+    
+    for i in range(15):
+        print("wo Z:{}, gnss Z: {}".format(wo_pos_z[i], gnss_data[1,i]))
+    
 
-    plt.plot(t265_pos[0,:], t265_pos[1,:],"b")
+    plt.plot(wo_pos_x, wo_pos_z,"b")
     
     plt.plot(gnss_data[0], gnss_data[1], "r" )
     plt.axis('equal')
     plt.show()
 
-    plt.plot(t_t265,t265_error)
+    plt.plot(t_t265,wo_error)
     plt.show()
     
     

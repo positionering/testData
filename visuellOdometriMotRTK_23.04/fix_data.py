@@ -14,6 +14,7 @@ def fix_GPSdata(GPSdataV, GPSdataH, medel = 1, version = 1):
         heading = headingV2(GPSdata, medel)
 
 
+
     theta = angle_between(heading, np.array([0,1]))
     theta = np.copysign(theta, np.cross(heading, np.array([0,1])))
   
