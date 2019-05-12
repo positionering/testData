@@ -1,5 +1,15 @@
 import numpy as np
 
+def int32(x):
+    neg = False
+    if x<0:
+        neg = True
+        x = -x
+
+    while x > 0x7FFFFFFF:
+        x -= (0x100000000)
+
+    return -x if neg else x
 
 def fix_GPSdata(GPSdataV, GPSdataH, medel = 1, version = 1):
 
@@ -71,6 +81,8 @@ def main():
 
     print(fix_GPSdata(-path1, -path2, 1, 2))
     print(center_data(t))
+    
+    print(int32(1557307669410))
 
 
 if __name__ == "__main__":
