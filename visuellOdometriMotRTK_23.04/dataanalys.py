@@ -174,7 +174,6 @@ for t265_file, gnss_file_l, gnss_file_r in zip(list_of_files_t265, list_of_files
     """
     # Plot 2: POS GNSS och T265
     fig2 = plt.figure()
-
     plt.plot(gnss_pos[:,0], gnss_pos[:,1], label='Rutt från RTK-GNSS')
     plt.plot(t265_pos_x, t265_pos_z, label='Rutt från T265')
     
@@ -209,5 +208,3 @@ for t265_file, gnss_file_l, gnss_file_r in zip(list_of_files_t265, list_of_files
     plt.show()
     #plt.savefig('sluttest/figures/' + t265_file.split('/')[2].split('.')[0] + '_VEL:WO.png') # TODO: Mappstruktur
     plt.close(fig3)
-
-
