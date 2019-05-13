@@ -32,6 +32,19 @@ def fix_GPSdata(GPSdataV, GPSdataH, medel = 1, version = 1):
     return rotate_2Ddata(GPSdata, theta)
 
 
+def fix_data(data, medel = 1):
+    if version == 2:
+        i = 1
+        while np.linalg.norm(data[i,:]) < medel:
+            i += 1
+        heading = headingV2(data, i)
+
+    theta = angle_between(heading, np.array([0,1]))
+    theta = np.copysign(theta, np.cross(heading, np.array([0,1])))
+  
+    return rotate_2Ddata(data, theta)
+
+
 def headingV1(GPSdataV, GPSdataH, medel):
     heading = np.array([0,0])
     for i in range(medel):
