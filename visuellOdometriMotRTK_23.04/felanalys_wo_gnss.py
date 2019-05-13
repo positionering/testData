@@ -180,8 +180,8 @@ for i,t265_file in enumerate(t265_list_of_files):
     plt.axis('equal')
     plt.show()
 
-    #plt.plot(t_t265,wo_error)
-    #plt.show()
+    plt.plot(t_t265,wo_error)
+    plt.show()
     
     
 

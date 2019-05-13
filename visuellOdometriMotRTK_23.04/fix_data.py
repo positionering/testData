@@ -33,11 +33,11 @@ def fix_GPSdata(GPSdataV, GPSdataH, medel = 1, version = 1):
 
 
 def fix_data(data, medel = 1):
-    if version == 2:
-        i = 1
-        while np.linalg.norm(data[i,:]) < medel:
-            i += 1
-        heading = headingV2(data, i)
+
+    i = 1
+    while np.linalg.norm(data[i,:]) < medel:
+        i += 1
+    heading = headingV2(data, i)
 
     theta = angle_between(heading, np.array([0,1]))
     theta = np.copysign(theta, np.cross(heading, np.array([0,1])))
@@ -53,11 +53,12 @@ def headingV1(GPSdataV, GPSdataH, medel):
     return heading
 
 
-def headingV2(GPSdata, medel):
+def headingV2(data, medel):
     heading = np.array([0,0])
     for i in range(medel):
         for j in range(i+1, medel):
-            heading = heading + (GPSdata[j,:] - GPSdata[i,:])
+            heading = heading + (data[j,:] - data[i,:])
+    heading = data[medel,:]
     heading = unit_vector(heading)
     return heading
 
