@@ -14,9 +14,9 @@ from scipy.integrate import trapz
 
 
 
-t265_list_of_files = sorted(glob.glob('test/t265/190508rakF*')) 
-gnss222_list_of_files = sorted(glob.glob('test/cord222/190508rakF*'))
-gnss223_list_of_files = sorted(glob.glob('test/cord223/190508rakF*'))
+t265_list_of_files = sorted(glob.glob('test/t265/190508*')) 
+gnss222_list_of_files = sorted(glob.glob('test/cord222/190508*'))
+gnss223_list_of_files = sorted(glob.glob('test/cord223/190508*'))
 
 
 for i,t265_file in enumerate(t265_list_of_files):
@@ -75,8 +75,12 @@ for i,t265_file in enumerate(t265_list_of_files):
         for line in f3:
             
             # time
-            t_t265.append(float(line.split()[1]))
+            t_temp = float(line.split()[1])
+            if t_temp in t_t265:
+                continue
+            t_t265.append(t_temp)
 
+            
             # t265
             t265_pos_x.append(float(line.split()[3]))
             t265_pos_z.append(-float(line.split()[5])) #speglar runt x
@@ -85,36 +89,52 @@ for i,t265_file in enumerate(t265_list_of_files):
             tic_r.append(float(line.split()[20]))
             tic_l.append(float(line.split()[19]))
 
+    #Delete first to fit wo
+    del t265_pos_x[0]
+    del t_t265[0]
+    del t265_pos_z[0]
+    
     # Wheel odometry position
     
    
     wo_pos_x, wo_pos_z, wo_heading_rad = wo_location(tic_l, tic_r, "filename")
 
-    wo_pos = np.array([wo_pos_x,wo_pos_z])
+    wo_pos_x = np.array(wo_pos_x)
+    wo_pos_z = np.array(wo_pos_z)
 
     #time
-    t_t265 = np.array(t_t265).T
+    t_t265 = np.array([t_t265]).T
+
+    
+    np.apply_along_axis(int32,1,t_t265)
+
     t_222 = np.array(t_222).T
     t_223 = np.array(t_223).T
+    
+      
 
-    t_222 = center_data(t_222)
-    t_223 = center_data(t_223)
-    t_t265 = center_data(t_t265)
+    sub = min(t_223[0],t_222[0],t_t265[0])        
+    t_t265 -= sub
+    t_222 -= sub
+    t_223  -= sub
+        
+    start = int(max(t_223[0],t_222[0],t_t265[0][0]))
+    end = int(min(t_223[-1],t_222[-1],t_t265[-1]))
+    
+    time = range(start,end,50)
+
 
 
     t_t265 = np.array(t_t265).squeeze()
     t_222 = np.array(t_222).squeeze()
     t_223 = np.array(t_223).squeeze()
     # GNSSdata
-   
     
 
     gnss222_pos_x = np.array(gnss222_pos_x)
     gnss223_pos_z = np.array(gnss223_pos_z)
 
     
-    # Camera data
-    t265_pos = np.array([t265_pos_x,t265_pos_z]) #roterar 180
 
 
 
@@ -130,47 +150,63 @@ for i,t265_file in enumerate(t265_list_of_files):
         #print(t265_file)
         continue
 
-    #Interpolate GNSS data
-    f_interp_222_x = interp1d(t_222, gnss222_pos_x,fill_value="extrapolate")
-    f_interp_222_z = interp1d(t_222, gnss222_pos_z,fill_value="extrapolate")
+    #Interpolate GNSS and t265
+    f_interp_222_x = interp1d(t_222, gnss222_pos_x, kind="cubic" )
+    f_interp_222_z = interp1d(t_222, gnss222_pos_z, kind="cubic")
     
-    f_interp_223_x = interp1d(t_223, gnss223_pos_x,fill_value="extrapolate")
-    f_interp_223_z = interp1d(t_223, gnss223_pos_z,fill_value="extrapolate")
-
-    t265_cum_error = []
-    for T in range(0, 2000, 10):
-        f_interp_222_x_value = f_interp_222_x(t_t265+T)
-        f_interp_222_z_value = f_interp_222_z(t_t265+T)
-        
-        f_interp_223_x_value = f_interp_223_x(t_t265+T)
-        f_interp_223_z_value = f_interp_223_z(t_t265+T)
-        
-        #Fix GNSS date, angle + center
-        gnss_data = fix_GPSdata(np.array([f_interp_223_x_value,f_interp_223_z_value]).T, np.array([f_interp_222_x_value,f_interp_222_z_value]).T, 1, 2).T
-
-        #t265 error
-        t265_error = np.sqrt( (gnss_data[0] - t265_pos[0,:] )**2 + (gnss_data[1] - t265_pos[1,:] )**2 )
-        t265_cum_error.append(np.array([T, trapz(t265_error, t_t265)]))
-        
-        #print(max(t265_error))
+    f_interp_223_x = interp1d(t_223, gnss223_pos_x, kind="cubic")
+    f_interp_223_z = interp1d(t_223, gnss223_pos_z, kind="cubic")
     
-    t265_cum_error = np.array(t265_cum_error)
-    delay = t265_cum_error[np.argmin(t265_cum_error[:,1]),0]
+    f_interp_t265_x = interp1d(t_t265, t265_pos_x, kind="cubic")
+    f_interp_t265_z = interp1d(t_t265, t265_pos_z, kind="cubic")
+
+
+    f_interp_wo_x = interp1d(t_t265, wo_pos_x, kind="cubic")
+    f_interp_wo_z = interp1d(t_t265, wo_pos_z, kind="cubic")
+
+    
+    f_interp_222_x_value = f_interp_222_x(time)
+    f_interp_222_z_value = f_interp_222_z(time)
+    f_interp_223_x_value = f_interp_223_x(time)
+    f_interp_223_z_value = f_interp_223_z(time)
+    f_interp_t265_x_value = f_interp_t265_x(time)
+    f_interp_t265_z_value = f_interp_t265_z(time)
+    f_interp_wo_x_value = f_interp_wo_x(time)
+    f_interp_wo_z_value = f_interp_wo_z(time)
+
+    t265_pos = np.array([f_interp_t265_x_value ,f_interp_t265_z_value])
+    #Fix GNSS date, angle + center
+    gnss_data = fix_GPSdata(np.array([f_interp_223_x_value,f_interp_223_z_value]).T, np.array([f_interp_222_x_value,f_interp_222_z_value]).T, 1, 2).T
+
+    #t265 error
+    t265_error = np.sqrt( (gnss_data[0] - t265_pos[0,:] )**2 + (gnss_data[1] - t265_pos[1,:] )**2 )
+    #t265_cum_error.append(np.array([T, trapz(t265_error, t_t265)]))
+    
+    #print(max(t265_error))
+
+    #t265_cum_error = np.array(t265_cum_error)
+    #delay = t265_cum_error[np.argmin(t265_cum_error[:,1]),0]
     #print('----------',delay)
 
     #Wheel odometry error
     #wo_error = 
+    wo_error = np.sqrt( (gnss_data[0] - f_interp_wo_x_value )**2 + (gnss_data[1] - f_interp_wo_z_value )**2 )
 
 
         
+    fig = plt.figure()
 
-    plt.plot(t265_pos[0,:], t265_pos[1,:],"b")
+    plt.subplot(1, 2, 1)
+    plt.plot(t265_pos[0,:], t265_pos[1,:],"b", label="t265")
     
-    plt.plot(gnss_data[0], gnss_data[1], "r" )
+    plt.plot(gnss_data[0], gnss_data[1], "r" , label="gnss")
+    plt.plot(f_interp_wo_x_value,f_interp_wo_z_value, "g", label="wo")
     plt.axis('equal')
-    plt.show()
-
-    plt.plot(t_t265,t265_error)
+    
+    plt.subplot(1, 2, 2)
+    plt.plot(time,t265_error, label="t265 error")
+    plt.plot(time,wo_error, label="wo error")
+    plt.legend()
     plt.show()
     
     
