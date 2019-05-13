@@ -173,7 +173,7 @@ for i,t265_file in enumerate(t265_list_of_files):
     # Error
     t265_error = np.sqrt( (gnss_data[0] - t265_pos[0,:] )**2 + (gnss_data[1] - t265_pos[1,:] )**2 )
     wo_error = np.sqrt( (gnss_data[0] - f_interp_wo_x_value )**2 + (gnss_data[1] - f_interp_wo_z_value )**2 )
-    gnss_error = abs(np.sqrt( (f_interp_222_x_value - f_interp_223_x_value )**2 + (f_interp_222_z_value - f_interp_223_z_value )**2 ) -0.71 )
+    gnss_error = abs(np.sqrt( (f_interp_222_x_value - f_interp_223_x_value )**2 + (f_interp_222_z_value - f_interp_223_z_value )**2 ) -0.71 ) /2 
 
     # CUM ERROR
     wo_cum = cumtrapz(wo_error, time)
@@ -222,6 +222,17 @@ for i,t265_file in enumerate(t265_list_of_files):
     plt.xlabel("Tid [s]")
     plt.ylabel("Fel integretat över tid")
     plt.legend()
+    
+    plt.show()
+    
+
+
+    # Tabel
+    celltext= [['{}'.format(t265_error[-1]), '{}'.format(wo_error[-1]), '{}'.format(gnss_error[-1])],
+    ['{}'.format(t265_cum[-1]), '{}'.format(wo_cum[-1]), '{}'.format(gnss_cum[-1])]]
+    rows = ('Fel', 'Integrerat fel')
+    columns = ('Visuell Odometri', 'Hjulodometri', 'GNSS' )
+    plt.table(cellText=celltext,rowLabels=rows, colLabels=columns)
 
     plt.show()
     
