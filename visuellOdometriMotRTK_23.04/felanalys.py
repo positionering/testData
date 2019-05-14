@@ -9,7 +9,9 @@ import os
 from sensor_location_smooth import *
 from fix_data import *
 from scipy.interpolate import interp1d
+from scipy.interpolate import splrep, splev
 from scipy.integrate import cumtrapz
+from matplotlib import rc
 
 
 
@@ -24,7 +26,7 @@ for i,t265_file in enumerate(t265_list_of_files):
     gnss222_file = gnss222_list_of_files[i]
     gnss223_file = gnss223_list_of_files[i]
 
-
+    print("filnamn", t265_file)
     ### PREDEF ###
     
     # Time
@@ -122,7 +124,7 @@ for i,t265_file in enumerate(t265_list_of_files):
     start = int(max(t_223[0],t_222[0],t_t265[0][0]))
     end = int(min(t_223[-1],t_222[-1],t_t265[-1]))
     
-    time = np.arange(start,end,50)
+    time = np.arange(start,end,100)
 
     t_t265 = np.array(t_t265).squeeze()
     t_222 = np.array(t_222).squeeze()
@@ -136,13 +138,16 @@ for i,t265_file in enumerate(t265_list_of_files):
     gnss223_pos_z = np.array(gnss223_pos_z)
 
 
+    s = 0.0005
+
+    # Löste det. S är faktorn man vill multiplicera med. detta s är helt ok
 
     # Interpolate 
-    f_interp_222_x = interp1d(t_222, gnss222_pos_x, kind="cubic" )
-    f_interp_222_z = interp1d(t_222, gnss222_pos_z, kind="cubic")
+    f_interp_222_x = splrep(t_222, gnss222_pos_x, s=s)
+    f_interp_222_z = splrep(t_222, gnss222_pos_z, s=s)
     
-    f_interp_223_x = interp1d(t_223, gnss223_pos_x, kind="cubic")
-    f_interp_223_z = interp1d(t_223, gnss223_pos_z, kind="cubic")
+    f_interp_223_x = splrep(t_223, gnss223_pos_x, s=s)
+    f_interp_223_z = splrep(t_223, gnss223_pos_z, s=s)
     
     
     f_interp_t265_x = interp1d(t_t265, t265_pos_x, kind="cubic")
@@ -153,10 +158,10 @@ for i,t265_file in enumerate(t265_list_of_files):
     f_interp_wo_z = interp1d(t_t265, wo_pos_z, kind="cubic")
 
     
-    f_interp_222_x_value = f_interp_222_x(time)
-    f_interp_222_z_value = f_interp_222_z(time)
-    f_interp_223_x_value = f_interp_223_x(time)
-    f_interp_223_z_value = f_interp_223_z(time)
+    f_interp_222_x_value = splev(time, f_interp_222_x)
+    f_interp_222_z_value = splev(time, f_interp_222_z)
+    f_interp_223_x_value = splev(time, f_interp_223_x)
+    f_interp_223_z_value = splev(time, f_interp_223_z)
     f_interp_t265_x_value = f_interp_t265_x(time)
     f_interp_t265_z_value = f_interp_t265_z(time)
     f_interp_wo_x_value = f_interp_wo_x(time)
@@ -168,8 +173,12 @@ for i,t265_file in enumerate(t265_list_of_files):
     gnss_data = fix_GPSdata(np.array([f_interp_223_x_value,f_interp_223_z_value]).T, np.array([f_interp_222_x_value,f_interp_222_z_value]).T, 1, 2).T
 
     # GNSS traveled length
-    gnss_len = np.sqrt( np.square(gnss_data[0]) + np.square(gnss_data[1]) )
-    gnss_cum_len = cumtrapz(gnss_len)
+
+    gnss_len = gnss_data[:,1:]-gnss_data[:,:-1]
+    
+    gnss_len = np.sqrt( np.square(gnss_len[0] ) + np.square(gnss_len[1]) )
+    
+    gnss_cum_len = np.cumsum(gnss_len)
     
     # Error
     t265_error = np.sqrt( (gnss_data[0] - t265_pos[0,:] )**2 + (gnss_data[1] - t265_pos[1,:] )**2 )
@@ -177,55 +186,73 @@ for i,t265_file in enumerate(t265_list_of_files):
     gnss_error = abs(np.sqrt( (f_interp_222_x_value - f_interp_223_x_value )**2 + (f_interp_222_z_value - f_interp_223_z_value )**2 ) -0.71 ) /2 
 
     # CUM ERROR
-    wo_cum = cumtrapz(wo_error, time)
-    t265_cum = cumtrapz(t265_error, time)
-    gnss_cum = cumtrapz(gnss_error, time)
+    wo_cum = cumtrapz(wo_error[1:], gnss_cum_len)
+    t265_cum = cumtrapz(t265_error[1:], gnss_cum_len)
+    gnss_cum = cumtrapz(gnss_error[1:], gnss_cum_len)
     
+    wo_cum_med = wo_cum / gnss_cum_len[1:]
+    t265_cum_med = t265_cum / gnss_cum_len[1:]
+    gnss_cum_med = gnss_cum / gnss_cum_len[1:]
+
+
     # Plot
     fig = plt.figure()
 
-    plt.subplot(2, 2, 1)
-    plt.plot(t265_pos[0,:], t265_pos[1,:], label="Visuell odometri")
-    plt.plot(gnss_data[0], gnss_data[1], label="GNSS")
-    plt.plot(f_interp_wo_x_value,f_interp_wo_z_value, label="Hjulodometri")
+    # Options for matplotlib to get a nice plot
+    # rc('font', **{'family': 'serif', 'serif': ['DejaVu Sans'],
+    #             'size': 9})  # Helvetica
+    # rc('text', usetex=True)
+
+    #plt.subplot(2, 2, 1)
+    plt.plot(t265_pos[0,:], t265_pos[1,:],"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
+    plt.plot(gnss_data[0], gnss_data[1],"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
+    plt.plot(f_interp_wo_x_value,f_interp_wo_z_value,"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
     plt.axis('equal')
     plt.title('Uppmätt körbana')
-    plt.xlabel("Sträcka [m]")
-    plt.ylabel("Sträcka [m]")
+    plt.xlabel("Sträcka (m)")
+    plt.ylabel("Sträcka (m)")
+    plt.grid()
     plt.legend()
+    plt.savefig('rapportfigurer/{}_rutt.pdf'.format(t265_file.split('/')[2].split('.')[0]))
     
-    plt.subplot(2, 2, 2)
-    #konverterar till sekunder
-    plt.plot(time/1000,t265_error, label="Visuell odometri")
-    plt.plot(time/1000, gnss_error, label="GNSS")
-    plt.plot(time/1000,wo_error, label="Hjulodometri")
+    fig = plt.figure()
+    #plt.subplot(2, 2, 2)
+    plt.plot(gnss_cum_len, t265_error[1:],"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
+    plt.plot(gnss_cum_len, gnss_error[1:],"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
+    plt.plot(gnss_cum_len, wo_error[1:],"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
     plt.title('Beräknat fel över tid')
-    plt.xlabel("Tid [s]")
-    plt.ylabel("Sträcka [m]")
+    plt.xlabel("Sträcka (m)")
+    plt.ylabel("Fel, $\sigma$ (m)")
+    plt.grid()
     plt.legend()
-
-    """
-    plt.subplot(2,2,3)
-    plt.plot(time/1000, t265_error, label="Visuell odometri")
-    plt.plot(time/1000, gnss_error, label="GNSS")
-    plt.plot(time/1000, wo_error, label="Hjulodometri")
-    plt.title('Beräknat fel över körsträcka')
-    plt.xlabel("Tid")
-    plt.ylabel("Fel integretat över tid")
-    plt.legend()
-    """
-
-    plt.subplot(2,2,4)
-    #konverterar till sekunder
-    plt.plot(time[:-1]/1000, t265_cum, label="Visuell odometri")
-    plt.plot(time[:-1]/1000, gnss_cum, label="GNSS")
-    plt.plot(time[:-1]/1000, wo_cum, label="Hjulodometri")
-    plt.title('Integrerat fel')
-    plt.xlabel("Tid [s]")
-    plt.ylabel("Fel integretat över tid")
-    plt.legend()
+    plt.savefig('rapportfigurer/{}_fel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
     
-    plt.show()
+
+
+    #plt.subplot(2,2,3)
+    fig = plt.figure()
+    plt.plot(gnss_cum_len[1:], t265_cum_med,"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
+    plt.plot(gnss_cum_len[1:], gnss_cum_med,"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
+    plt.plot(gnss_cum_len[1:], wo_cum_med,"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
+    plt.title('Medelfel vid körsträcka')
+    plt.xlabel("Sträcka (m)")
+    plt.ylabel(r"Medelfel, $\bar{\sigma}$ (m)")
+    plt.legend()
+    plt.grid()
+    plt.savefig('rapportfigurer/{}_medel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+    
+    
+    #plt.subplot(2,2,4)
+    fig = plt.figure()
+    plt.plot(gnss_cum_len[1:], t265_cum,"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
+    plt.plot(gnss_cum_len[1:], gnss_cum,"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
+    plt.plot(gnss_cum_len[1:], wo_cum,"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
+    plt.title('Integrerat fel vid körsträcka')
+    plt.xlabel("Sträcka (m)")
+    plt.ylabel("Integretat fel (m$^{2}$)")
+    plt.legend()
+    plt.grid()
+    plt.savefig('rapportfigurer/{}_intfel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
     
 
     """
