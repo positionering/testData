@@ -169,6 +169,7 @@ for i,t265_file in enumerate(t265_list_of_files):
 
     # GNSS traveled length
     gnss_len = np.sqrt( np.square(gnss_data[0]) + np.square(gnss_data[1]) )
+    gnss_cum_len = cumtrapz(gnss_len)
     
     # Error
     t265_error = np.sqrt( (gnss_data[0] - t265_pos[0,:] )**2 + (gnss_data[1] - t265_pos[1,:] )**2 )
@@ -203,21 +204,22 @@ for i,t265_file in enumerate(t265_list_of_files):
     plt.ylabel("Sträcka [m]")
     plt.legend()
 
+    """
     plt.subplot(2,2,3)
-    plt.plot(gnss_len, t265_error, label="Visuell odometri")
-    plt.plot(gnss_len, gnss_error, label="GNSS")
-    plt.plot(gnss_len, wo_error, label="Hjulodometri")
+    plt.plot(time/1000, t265_error, label="Visuell odometri")
+    plt.plot(time/1000, gnss_error, label="GNSS")
+    plt.plot(time/1000, wo_error, label="Hjulodometri")
     plt.title('Beräknat fel över körsträcka')
-    plt.xlabel("Sträcka [m]")
+    plt.xlabel("Tid")
     plt.ylabel("Fel integretat över tid")
     plt.legend()
-
+    """
 
     plt.subplot(2,2,4)
     #konverterar till sekunder
-    plt.plot(time[:-1]/1000, t265_cum/1000, label="Visuell odometri")
-    plt.plot(time[:-1]/1000, gnss_cum/1000, label="GNSS")
-    plt.plot(time[:-1]/1000, wo_cum/1000, label="Hjulodometri")
+    plt.plot(time[:-1]/1000, t265_cum, label="Visuell odometri")
+    plt.plot(time[:-1]/1000, gnss_cum, label="GNSS")
+    plt.plot(time[:-1]/1000, wo_cum, label="Hjulodometri")
     plt.title('Integrerat fel')
     plt.xlabel("Tid [s]")
     plt.ylabel("Fel integretat över tid")
@@ -226,7 +228,7 @@ for i,t265_file in enumerate(t265_list_of_files):
     plt.show()
     
 
-
+    """
     # Tabel
     celltext= [['{}'.format(t265_error[-1]), '{}'.format(wo_error[-1]), '{}'.format(gnss_error[-1])],
     ['{}'.format(t265_cum[-1]), '{}'.format(wo_cum[-1]), '{}'.format(gnss_cum[-1])]]
@@ -236,13 +238,4 @@ for i,t265_file in enumerate(t265_list_of_files):
 
     plt.show()
     
-    
-
-
-
-
-
-
-
-
-
+    """
