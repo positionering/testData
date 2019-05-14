@@ -26,7 +26,7 @@ for i,t265_file in enumerate(t265_list_of_files):
     gnss222_file = gnss222_list_of_files[i]
     gnss223_file = gnss223_list_of_files[i]
 
-    print("filnamn", t265_file)
+    #print("filnamn", t265_file)
     ### PREDEF ###
     
     # Time
@@ -53,22 +53,34 @@ for i,t265_file in enumerate(t265_list_of_files):
     with open(gnss222_file, 'r') as f1:
         f1 = f1.readlines()
         del f1[-1]
+        first = True
         for line in f1:
-            t_222.append(float(line.split()[1]))
             lat = line.split()[3]
             lon = line.split()[5]
             u = utm.from_latlon(float(lat), float(lon))
+            if first:
+                u_first = u
+                first = False
+            if abs(u[0] - u_first[0]) > 500 or abs(u[1] - u_first[1]) > 500:
+                continue
+            t_222.append(float(line.split()[1]))
             gnss222_pos_x.append(u[0])
             gnss222_pos_z.append(u[1])
 
     with open(gnss223_file, 'r') as f2:
         f2 = f2.readlines()
         del f2[-1]
+        first = True
         for line in f2:
-            t_223.append(float(line.split()[1]))
             lat = line.split()[3]
             lon = line.split()[5]
             u = utm.from_latlon(float(lat), float(lon))
+            if first:
+                u_first = u
+                first = False
+            if abs(u[0] - u_first[0]) > 500 or abs(u[1] - u_first[1]) > 500:
+                continue
+            t_223.append(float(line.split()[1]))
             gnss223_pos_x.append(u[0])
             gnss223_pos_z.append(u[1])
     
@@ -115,7 +127,7 @@ for i,t265_file in enumerate(t265_list_of_files):
 
     t_222 = np.array(t_222).T 
     t_223 = np.array(t_223).T 
-
+    
     sub = min(t_223[0],t_222[0],t_t265[0])        
     t_t265 -= sub
     t_222 -= sub
@@ -262,17 +274,22 @@ for i,t265_file in enumerate(t265_list_of_files):
     
     filnamn = t265_file.split('/')[2].split('.')[0]
     
-    tabell_t265 = r"{}& &{:.2f}&{:.2f}&{:.2f}&{:.2f}&{:.2f} \\".format(filnamn, gnss_cum_len[-1], t265_error_max, t265_error[-1], t265_cum_med[-1], t265_cum[-1])
+    #Tabeller appendix
+    tabell_t265 = r"{}& & &{:.2f}&{:.2f}&{:.2f}&{:.2f}&{:.2f} \\".format(filnamn, gnss_cum_len[-1], t265_error_max, t265_error[-1], t265_cum_med[-1], t265_cum[-1])
     
-    tabell_wo = r"{}& &{:.2f}&{:.2f}&{:.2f}&{:.2f}&{:.2f} \\".format(filnamn, gnss_cum_len[-1], wo_error_max, wo_error[-1], wo_cum_med[-1], wo_cum[-1])
+    tabell_wo = r"{}& & &{:.2f}&{:.2f}&{:.2f}&{:.2f}&{:.2f} \\".format(filnamn, gnss_cum_len[-1], wo_error_max, wo_error[-1], wo_cum_med[-1], wo_cum[-1])
     
-    tabell_gnss = r"{}& &{:.2f}&{:.2f}&{:.2f}&{:.2f}&{:.2f} \\".format(filnamn, gnss_cum_len[-1], gnss_error_max, gnss_error[-1], gnss_cum_med[-1], gnss_cum[-1])
+    tabell_gnss = r"{}& & &{:.2f}&{:.2f}&{:.2f}&{:.2f}&{:.2f} \\".format(filnamn, gnss_cum_len[-1], gnss_error_max, gnss_error[-1], gnss_cum_med[-1], gnss_cum[-1])
     
-    print('{}'.format(tabell_t265))
+    #print('{}'.format(tabell_t265))
 
-    print('{}'.format(tabell_wo))
+    #print('{}'.format(tabell_wo))
 
-    print('{}'.format(tabell_gnss))
+    #print('{}'.format(tabell_gnss))
+    
+    #Tabeller resultat
+
+    
     """
     # Tabel
     celltext= [['{}'.format(t265_error[-1]), '{}'.format(wo_error[-1]), '{}'.format(gnss_error[-1])],
