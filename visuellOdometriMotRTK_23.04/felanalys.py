@@ -185,11 +185,17 @@ for i,t265_file in enumerate(t265_list_of_files):
     wo_error = np.sqrt( (gnss_data[0] - f_interp_wo_x_value )**2 + (gnss_data[1] - f_interp_wo_z_value )**2 )
     gnss_error = abs(np.sqrt( (f_interp_222_x_value - f_interp_223_x_value )**2 + (f_interp_222_z_value - f_interp_223_z_value )**2 ) -0.71 ) /2 
 
+    # max error
+    wo_error_max = np.max(wo_error)
+    t265_error_max = np.max(t265_error)
+    gnss_error_max = np.max(wo_error)
+
     # CUM ERROR
     wo_cum = cumtrapz(wo_error[1:], gnss_cum_len)
     t265_cum = cumtrapz(t265_error[1:], gnss_cum_len)
     gnss_cum = cumtrapz(gnss_error[1:], gnss_cum_len)
     
+    #cum medel
     wo_cum_med = wo_cum / gnss_cum_len[1:]
     t265_cum_med = t265_cum / gnss_cum_len[1:]
     gnss_cum_med = gnss_cum / gnss_cum_len[1:]
@@ -213,7 +219,7 @@ for i,t265_file in enumerate(t265_list_of_files):
     plt.ylabel("Sträcka (m)")
     plt.grid()
     plt.legend()
-    plt.savefig('rapportfigurer/{}_rutt.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+    #plt.savefig('rapportfigurer/{}_rutt.pdf'.format(t265_file.split('/')[2].split('.')[0]))
     
     fig = plt.figure()
     #plt.subplot(2, 2, 2)
@@ -225,7 +231,7 @@ for i,t265_file in enumerate(t265_list_of_files):
     plt.ylabel("Fel, $\sigma$ (m)")
     plt.grid()
     plt.legend()
-    plt.savefig('rapportfigurer/{}_fel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+    #plt.savefig('rapportfigurer/{}_fel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
     
 
 
@@ -239,7 +245,7 @@ for i,t265_file in enumerate(t265_list_of_files):
     plt.ylabel(r"Medelfel, $\bar{\sigma}$ (m)")
     plt.legend()
     plt.grid()
-    plt.savefig('rapportfigurer/{}_medel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+    #plt.savefig('rapportfigurer/{}_medel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
     
     
     #plt.subplot(2,2,4)
@@ -252,9 +258,21 @@ for i,t265_file in enumerate(t265_list_of_files):
     plt.ylabel("Integretat fel (m$^{2}$)")
     plt.legend()
     plt.grid()
-    plt.savefig('rapportfigurer/{}_intfel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+    #plt.savefig('rapportfigurer/{}_intfel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
     
+    filnamn = t265_file.split('/')[2].split('.')[0]
+    
+    tabell_t265 = r"{}& &{:.2f}&{:.2f}&{:.2f}&{:.2f}&{:.2f} \\".format(filnamn, gnss_cum_len[-1], t265_error_max, t265_error[-1], t265_cum_med[-1], t265_cum[-1])
+    
+    tabell_wo = r"{}& &{:.2f}&{:.2f}&{:.2f}&{:.2f}&{:.2f} \\".format(filnamn, gnss_cum_len[-1], wo_error_max, wo_error[-1], wo_cum_med[-1], wo_cum[-1])
+    
+    tabell_gnss = r"{}& &{:.2f}&{:.2f}&{:.2f}&{:.2f}&{:.2f} \\".format(filnamn, gnss_cum_len[-1], gnss_error_max, gnss_error[-1], gnss_cum_med[-1], gnss_cum[-1])
+    
+    print('{}'.format(tabell_t265))
 
+    print('{}'.format(tabell_wo))
+
+    print('{}'.format(tabell_gnss))
     """
     # Tabel
     celltext= [['{}'.format(t265_error[-1]), '{}'.format(wo_error[-1]), '{}'.format(gnss_error[-1])],
