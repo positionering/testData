@@ -91,7 +91,8 @@ void pos_llh_callback(u16 sender_id, u8 len, u8 msg[], void *context)
   
     //if( strcmp(tcp_ip_addr,"192.168.0.222") == 0){
   //std::cout << "tid: "<<  ms.count() << " lat: " << pos_llh.lat << " lon: " << pos_llh.lon << std::endl; 
-  printf("tid %d lat %.10f lon %.10f\n",ms.count(), pos_llh.lat ,pos_llh.lon );
+  std::cout << std::setprecision(10) << std::fixed << "tid: "<<  ms.count() << " lat: " << pos_llh.lat << " lon: " << pos_llh.lon << std::endl; 
+  //printf("tid %d lat %.10f lon %.10f\n",ms.count(), pos_llh.lat ,pos_llh.lon );
     //}
   
 }
