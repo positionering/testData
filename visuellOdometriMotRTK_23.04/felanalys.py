@@ -213,66 +213,80 @@ for i,t265_file in enumerate(t265_list_of_files):
     gnss_cum_med = gnss_cum / gnss_cum_len[1:]
 
 
-    # Plot
-    fig = plt.figure()
+    filnamn = t265_file.split('/')[2].split('.')[0]
+    print(filnamn)
+
+    # --------Plot-------------
+
 
     # Options for matplotlib to get a nice plot
-    # rc('font', **{'family': 'serif', 'serif': ['DejaVu Sans'],
-    #             'size': 9})  # Helvetica
-    # rc('text', usetex=True)
-
-    #plt.subplot(2, 2, 1)
-    plt.plot(t265_pos[0,:], t265_pos[1,:],"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
-    plt.plot(gnss_data[0], gnss_data[1],"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
-    plt.plot(f_interp_wo_x_value,f_interp_wo_z_value,"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
-    plt.axis('equal')
-    plt.title('Uppmätt körbana')
-    plt.xlabel("Sträcka (m)")
-    plt.ylabel("Sträcka (m)")
-    plt.grid()
-    plt.legend()
-    #plt.savefig('rapportfigurer/{}_rutt.pdf'.format(t265_file.split('/')[2].split('.')[0]))
-    
-    fig = plt.figure()
-    #plt.subplot(2, 2, 2)
-    plt.plot(gnss_cum_len, t265_error[1:],"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
-    plt.plot(gnss_cum_len, gnss_error[1:],"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
-    plt.plot(gnss_cum_len, wo_error[1:],"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
-    plt.title('Beräknat fel över tid')
-    plt.xlabel("Sträcka (m)")
-    plt.ylabel("Fel, $\sigma$ (m)")
-    plt.grid()
-    plt.legend()
-    #plt.savefig('rapportfigurer/{}_fel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
-    
+    rc('font', **{'family': 'serif', 'serif': ['DejaVu Sans'],
+                'size': 9})  # Helvetica
+    rc('text', usetex=True)
 
 
-    #plt.subplot(2,2,3)
-    fig = plt.figure()
-    plt.plot(gnss_cum_len[1:], t265_cum_med,"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
-    plt.plot(gnss_cum_len[1:], gnss_cum_med,"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
-    plt.plot(gnss_cum_len[1:], wo_cum_med,"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
-    plt.title('Medelfel vid körsträcka')
-    plt.xlabel("Sträcka (m)")
-    plt.ylabel(r"Medelfel, $\bar{\sigma}$ (m)")
-    plt.legend()
-    plt.grid()
-    #plt.savefig('rapportfigurer/{}_medel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+    try:
+        fig = plt.figure()
+        plt.plot(t265_pos[0,:], t265_pos[1,:],"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
+        plt.plot(gnss_data[0], gnss_data[1],"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
+        plt.plot(f_interp_wo_x_value,f_interp_wo_z_value,"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
+        plt.axis('equal')
+        plt.title('Uppmätt körbana')
+        plt.xlabel("Sträcka (m)")
+        plt.ylabel("Sträcka (m)")
+        plt.grid()
+        plt.legend()
+        plt.savefig('rapportfigurer/{}_rutt.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+        plt.close()
+    except:
+        print("Faild 1")
+
+    try:
+        fig = plt.figure()
+        plt.plot(gnss_cum_len, t265_error[1:],"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
+        plt.plot(gnss_cum_len, gnss_error[1:],"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
+        plt.plot(gnss_cum_len, wo_error[1:],"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
+        plt.title('Beräknat fel över tid')
+        plt.xlabel("Sträcka (m)")
+        plt.ylabel("Fel, $\sigma$ (m)")
+        plt.grid()
+        plt.legend()
+        plt.savefig('rapportfigurer/{}_fel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+        plt.close()
+    except:
+        print("Faild 2") 
+
+
+    try:
+        fig = plt.figure()
+        plt.plot(gnss_cum_len[1:], t265_cum_med,"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
+        plt.plot(gnss_cum_len[1:], gnss_cum_med,"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
+        plt.plot(gnss_cum_len[1:], wo_cum_med,"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
+        plt.title('Medelfel vid körsträcka')
+        plt.xlabel("Sträcka (m)")
+        plt.ylabel(r"Medelfel, $\bar{\sigma}$ (m)")
+        plt.legend()
+        plt.grid()
+        plt.savefig('rapportfigurer/{}_medel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+        plt.close()
+    except:
+        print("Faild 3")
     
-    
-    #plt.subplot(2,2,4)
-    fig = plt.figure()
-    plt.plot(gnss_cum_len[1:], t265_cum,"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
-    plt.plot(gnss_cum_len[1:], gnss_cum,"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
-    plt.plot(gnss_cum_len[1:], wo_cum,"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
-    plt.title('Integrerat fel vid körsträcka')
-    plt.xlabel("Sträcka (m)")
-    plt.ylabel("Integretat fel (m$^{2}$)")
-    plt.legend()
-    plt.grid()
-    #plt.savefig('rapportfigurer/{}_intfel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
-    
-    filnamn = t265_file.split('/')[2].split('.')[0]
+    try:
+        fig = plt.figure()
+        plt.plot(gnss_cum_len[1:], t265_cum,"#D7191C",linestyle="--", label="Visuell odometri", linewidth=2)
+        plt.plot(gnss_cum_len[1:], gnss_cum,"#FDAE61",linestyle="-", label="GNSS", linewidth=2)
+        plt.plot(gnss_cum_len[1:], wo_cum,"#2C7BB6",linestyle="-.", label="Hjulodometri", linewidth=2)
+        plt.title('Integrerat fel vid körsträcka')
+        plt.xlabel("Sträcka (m)")
+        plt.ylabel("Integretat fel (m$^{2}$)")
+        plt.legend()
+        plt.grid()
+        plt.savefig('rapportfigurer/{}_intfel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+        plt.close()
+    except:
+        print("Faild 4")
+
     
     #Tabeller appendix
     tabell_t265 = r"{}& & &{:.2f}&{:.2f}&{:.2f}&{:.2f}&{:.2f} \\".format(filnamn, gnss_cum_len[-1], t265_error_max, t265_error[-1], t265_cum_med[-1], t265_cum[-1])
