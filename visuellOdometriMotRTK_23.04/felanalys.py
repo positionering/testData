@@ -221,8 +221,9 @@ for i,t265_file in enumerate(t265_list_of_files):
 
     # Options for matplotlib to get a nice plot
     rc('font', **{'family': 'serif', 'serif': ['DejaVu Sans'],
-                'size': 9})  # Helvetica
+               'size': 9})  # Helvetica
     rc('text', usetex=True)
+
 
 
     try:
@@ -236,10 +237,11 @@ for i,t265_file in enumerate(t265_list_of_files):
         plt.ylabel("Sträcka (m)")
         plt.grid()
         plt.legend()
-        plt.savefig('rapportfigurer/{}_rutt.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+        plt.savefig('rapportfigurer_latex/{}_rutt.pdf'.format(t265_file.split('/')[2].split('.')[0]))
         plt.close()
-    except:
+    except Exception as e:
         print("Faild 1")
+        print(e)
 
     try:
         fig = plt.figure()
@@ -251,11 +253,11 @@ for i,t265_file in enumerate(t265_list_of_files):
         plt.ylabel("Fel, $\sigma$ (m)")
         plt.grid()
         plt.legend()
-        plt.savefig('rapportfigurer/{}_fel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+        plt.savefig('rapportfigurer_latex/{}_fel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
         plt.close()
-    except:
+    except Exception as e:
         print("Faild 2") 
-
+        print(e)
 
     try:
         fig = plt.figure()
@@ -267,10 +269,12 @@ for i,t265_file in enumerate(t265_list_of_files):
         plt.ylabel(r"Medelfel, $\bar{\sigma}$ (m)")
         plt.legend()
         plt.grid()
-        plt.savefig('rapportfigurer/{}_medel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+        plt.savefig('rapportfigurer_latex/{}_medel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
         plt.close()
-    except:
+    except Exception as e:
         print("Faild 3")
+        print(e)
+
     
     try:
         fig = plt.figure()
@@ -282,10 +286,12 @@ for i,t265_file in enumerate(t265_list_of_files):
         plt.ylabel("Integretat fel (m$^{2}$)")
         plt.legend()
         plt.grid()
-        plt.savefig('rapportfigurer/{}_intfel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
+        plt.savefig('rapportfigurer_latex/{}_intfel.pdf'.format(t265_file.split('/')[2].split('.')[0]))
         plt.close()
-    except:
+    except Exception as e:
         print("Faild 4")
+        print(e)        
+
 
     
     #Tabeller appendix
