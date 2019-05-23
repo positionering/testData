@@ -1,9 +1,6 @@
-x = 0
-y = 0
-
+from time import sleep
 with open("logtest.txt", 'w') as f:
-    while x != 10000:
-        f.write(str(x) + ' ' + str(y) + '\n')
-        y += 0.5
-        x += 1
-
+    for i in range(10):
+        f.write(str(i) + '\n')
+        f.flush()
+        sleep(1)
